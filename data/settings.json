@@ -1,0 +1,263 @@
+{
+    "scouts_year": "2026-2027",
+    "accounts": {
+        "groepsleiding": {
+            "role_name": "Groepsleiding",
+            "password_hash": "$2y$12$zVfdf47vZ7Pi98QdMqukt.12k1NktFdIG.oC.HjOI.K9lr3OVVqxq"
+        },
+        "kapoenen": {
+            "role_name": "Kapoenenleiding",
+            "password_hash": "$2y$12$hCv3hY8SgAKdSbLbMdGa4uqzV/cldcawydBqwS.dUqOliBnt97yMO"
+        },
+        "welpen": {
+            "role_name": "Welpenleiding",
+            "password_hash": "$2y$12$oLtwQJW9EZ7JEoQ.ZdYdM.Qx5c56Knv03820gJlp2PNroyQmMNCF6"
+        },
+        "jonggivers": {
+            "role_name": "Jonggiverleiding",
+            "password_hash": "$2y$12$yjMflYfJOT5EgRSU0zHAtu3L09dBxqnoJNnrJ/RbAn/cQW397HKL2"
+        },
+        "givers": {
+            "role_name": "Giverleiding",
+            "password_hash": "$2y$12$YSUt5SQMBex6A7QGEkPDWOap2HXtbgxPjWX04tsKt2ZF9oWOKQnxm"
+        }
+    },
+    "bank_iban": "BE59 7360 6413 2626",
+    "bank_bic": "KRIKOBE2B",
+    "bank_holder": "Scouts Kriko-M",
+    "contact_email": "groepsleiding@kriko-m.be",
+    "contact_phone": "+32 471 31 37 78",
+    "contact_address": "VP-plein (Industriepark Noord 33), 9100 Sint-Niklaas",
+    "alert_message": "Welkom op de gloednieuwe website van Scouts Kriko-M! De inschrijvingen voor het nieuwe scoutsjaar zijn geopend.",
+    "alert_active": true,
+    "registration_fee_first": 50,
+    "registration_fee_extra": 45,
+    "takken": {
+        "kapoenen": {
+            "name": "Kapoenen",
+            "age_range": "6 - 8 jaar",
+            "school_year": "1e & 2e leerjaar",
+            "email": "kapoenenleiding@kriko-m.be",
+            "description": "Voor de allerjongsten (de kapoenen) is de scouts een gloednieuwe wereld vol fantasie, spel en verwondering. We spelen bosspelen, knutselen erop los, verkleden ons en maken veel plezier. Spelenderwijs leren ze samenwerken, delen en hun grenzen verleggen in een veilige omgeving. De kapoenen gaan elk jaar op een superleuk weekend en sluiten het jaar af met een fantastisch 5-daags kamp in begin augustus!",
+            "uniform": "Kapoenen dragen geen volledig scoutsuniform. Het dragen van onze tweekleurige groepsdas (bordeaux met beige boordje) is verplicht en zorgt voor herkenbaarheid. Speelkleren die vuil mogen worden zijn ideaal!",
+            "class": "kapoenen",
+            "leaders": [
+                {
+                    "name": "Pieter Room",
+                    "role": "Takleider",
+                    "totem": "Lapis Lazuli Blauw Goud Levenslustige Lori",
+                    "phone": "+32 479 26 38 48"
+                },
+                {
+                    "name": "Marthe Isik",
+                    "role": "Leiding",
+                    "totem": "Dageraad rode doortastende Drongo",
+                    "phone": "+32 470 34 37 20"
+                },
+                {
+                    "name": "Lies Osselaer",
+                    "role": "Leiding",
+                    "totem": "Kassiageel kleurrijk konijn",
+                    "phone": ""
+                }
+            ],
+            "activities": {
+                "takweekend": {
+                    "title": "Kapoenenweekend",
+                    "dates": "17 - 19 April 2026",
+                    "reg_open": "2026-03-01",
+                    "reg_close": "2026-04-05",
+                    "price": 35,
+                    "active": true
+                },
+                "groepsweekend": {
+                    "title": "Groepsweekend",
+                    "dates": "13 - 15 Maart 2026",
+                    "reg_open": "2026-01-15",
+                    "reg_close": "2026-03-01",
+                    "price": 45,
+                    "active": true
+                },
+                "kamp": {
+                    "title": "Kapoenen Zomerkamp",
+                    "dates": "1 - 5 Augustus 2026",
+                    "reg_open": "2026-05-01",
+                    "reg_close": "2026-06-15",
+                    "price": 95,
+                    "active": true
+                }
+            }
+        },
+        "welpen": {
+            "name": "Welpen",
+            "age_range": "8 - 11 jaar",
+            "school_year": "3e, 4e & 5e leerjaar",
+            "email": "welpenleiding@kriko-m.be",
+            "description": "Welpen duiken in de jungle! Ge\u00efnspireerd door de sfeer en verhalen van het Jungleboek beleven ze actieve spelen, leren ze scouts-vaardigheden, gaan ze op weekend en sluiten ze het scoutsjaar af met een geweldig 7-daags kamp in begin augustus!",
+            "uniform": "Welpen dragen geen volledig scoutsuniform. De tweekleurige groepsdas is verplicht. We raden ook ten zeerste aan om ons bordeaux Kriko-M T-shirt of de warme bordeaux Kriko-M trui te dragen.",
+            "class": "welpen",
+            "leaders": [
+                {
+                    "name": "Lotte Cerpentier",
+                    "role": "Takleider",
+                    "totem": "Ringoogparelmoer Gele Ruimhartige Rayador",
+                    "phone": "+32 495 99 29 57"
+                },
+                {
+                    "name": "Vic Verhaegen",
+                    "role": "Leiding",
+                    "totem": "Wasabigroene Vindingrijke Mus",
+                    "phone": "+32 477 21 36 53"
+                },
+                {
+                    "name": "Lotte Waeckens",
+                    "role": "Leiding",
+                    "totem": "Asterlila Aimabele Antilope",
+                    "phone": "+32 479 36 93 14"
+                },
+                {
+                    "name": "Yenthe Scholiers",
+                    "role": "Leiding",
+                    "totem": "Diepspinel Roze Dromerige Dolfijn",
+                    "phone": "+32 493 96 76 90"
+                }
+            ],
+            "activities": {
+                "takweekend": {
+                    "title": "Welpenweekend",
+                    "dates": "17 - 19 April 2026",
+                    "reg_open": "2026-03-01",
+                    "reg_close": "2026-04-05",
+                    "price": 35,
+                    "active": true
+                },
+                "groepsweekend": {
+                    "title": "Groepsweekend",
+                    "dates": "13 - 15 Maart 2026",
+                    "reg_open": "2026-01-15",
+                    "reg_close": "2026-03-01",
+                    "price": 45,
+                    "active": true
+                },
+                "kamp": {
+                    "title": "Welpen Zomerkamp",
+                    "dates": "1 - 7 Augustus 2026",
+                    "reg_open": "2026-05-01",
+                    "reg_close": "2026-06-15",
+                    "price": 95,
+                    "active": true
+                }
+            }
+        },
+        "jonggivers": {
+            "name": "Jonggivers",
+            "age_range": "11 - 14 jaar",
+            "school_year": "6e leerjaar, 1e & 2e middelbaar",
+            "email": "jonggiverleiding@kriko-m.be",
+            "description": "Tijd voor actie! Jonggivers houden van avontuur en uitdagingen. Ze leren grotere constructies sjorren, navigeren met kaart en kompas, koken hun eigen potje op een houtvuur en slapen in echte scoutstenten tijdens hun 11-daagse zomerkamp in begin augustus.",
+            "uniform": "Het volledige scoutsuniform is verplicht: de tweekleurige Kriko-M groepsdas, het beige Hopper scoutshemd, en de groene scoutsbroek of scoutsrok.",
+            "class": "jonggivers",
+            "leaders": [
+                {
+                    "name": "Jelle Scholiers",
+                    "role": "Takleider",
+                    "totem": "Blijmoedige Beo",
+                    "phone": "+32 491 91 99 90"
+                },
+                {
+                    "name": "Sara Meyten",
+                    "role": "Leiding",
+                    "totem": "Wavellietgroene Wilskrachtige Waterwolf",
+                    "phone": "+32 468 58 09 01"
+                },
+                {
+                    "name": "Marie Vanesbroeck",
+                    "role": "Leiding",
+                    "totem": "Karmozijn rode karaktervolle Kavka",
+                    "phone": "+32 468 53 49 81"
+                }
+            ],
+            "activities": {
+                "takweekend": {
+                    "title": "Jonggiverweekend",
+                    "dates": "10 - 12 April 2026",
+                    "reg_open": "2026-02-15",
+                    "reg_close": "2026-04-01",
+                    "price": 38,
+                    "active": true
+                },
+                "groepsweekend": {
+                    "title": "Groepsweekend",
+                    "dates": "13 - 15 Maart 2026",
+                    "reg_open": "2026-01-15",
+                    "reg_close": "2026-03-01",
+                    "price": 45,
+                    "active": true
+                },
+                "kamp": {
+                    "title": "Jonggiver Zomerkamp",
+                    "dates": "1 - 11 Augustus 2026",
+                    "reg_open": "2026-04-15",
+                    "reg_close": "2026-06-15",
+                    "price": 145,
+                    "active": true
+                }
+            }
+        },
+        "givers": {
+            "name": "Givers",
+            "age_range": "14 - 17 jaar",
+            "school_year": "3e, 4e & 5e middelbaar",
+            "email": "giverleiding@kriko-m.be",
+            "description": "De givers bepalen hun eigen weg en dragen meer verantwoordelijkheid. Ze bedenken vaak hun eigen activiteiten, gaan op uitdagende droppingen, en gaan elke drie jaar op een legendarisch buitenlands zomerkamp (en de andere jaren een 11-daags kamp in begin augustus).",
+            "uniform": "Het volledige scoutsuniform is verplicht: de tweekleurige Kriko-M groepsdas, het beige Hopper scoutshemd, en de groene scoutsbroek of scoutsrok.",
+            "class": "givers",
+            "leaders": [
+                {
+                    "name": "Thomas Meyten",
+                    "role": "Takleider",
+                    "totem": "Attente Agoeti",
+                    "phone": "+32 468 25 88 92"
+                },
+                {
+                    "name": "Lucas Van Cleemput",
+                    "role": "Leiding",
+                    "totem": "Kiene Kia",
+                    "phone": "+32 468 41 95 02"
+                },
+                {
+                    "name": "Eve Bonza",
+                    "role": "Leiding",
+                    "totem": "Vulkaanpyriet goud Vurige Vlinder",
+                    "phone": "+32 465 31 18 81"
+                }
+            ],
+            "activities": {
+                "takweekend": {
+                    "title": "Giverweekend",
+                    "dates": "10 - 12 April 2026",
+                    "reg_open": "2026-02-15",
+                    "reg_close": "2026-04-01",
+                    "price": 40,
+                    "active": true
+                },
+                "groepsweekend": {
+                    "title": "Groepsweekend",
+                    "dates": "13 - 15 Maart 2026",
+                    "reg_open": "2026-01-15",
+                    "reg_close": "2026-03-01",
+                    "price": 45,
+                    "active": true
+                },
+                "kamp": {
+                    "title": "Giver Zomerkamp",
+                    "dates": "1 - 11 Augustus 2026",
+                    "reg_open": "2026-03-01",
+                    "reg_close": "2026-06-01",
+                    "price": 145,
+                    "active": true
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+[
+    {
+        "id": "cal_1",
+        "title": "Startdag Scoutsjaar",
+        "date": "2026-09-06",
+        "time": "09:45 - 12:30",
+        "description": "De allereerste scoutsvergadering van het nieuwe jaar! Iedereen is welkom om te komen proberen.",
+        "location": "VP-plein, Industriepark-Noord 33"
+    },
+    {
+        "id": "cal_2",
+        "title": "Kriko Dia-avond",
+        "date": "2026-10-17",
+        "time": "19:00 - 22:30",
+        "description": "Gezellige dia-avond met de leukste foto's en filmpjes van de afgelopen zomerkampen.",
+        "location": "Parochiecentrum Sint-Niklaas"
+    },
+    {
+        "id": "cal_3",
+        "title": "Jaarlijkse BBQ & Eetdag",
+        "date": "2026-11-15",
+        "time": "11:30 - 19:30",
+        "description": "Kom smullen op onze heerlijke jaarlijkse eetdag ten voordele van onze lokalen en tenten.",
+        "location": "Grote Speelzaal College"
+    }
+]

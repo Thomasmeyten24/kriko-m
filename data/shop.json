@@ -1,0 +1,87 @@
+[
+    {
+        "id": "item_1",
+        "name": "Kriko-M T-shirt (Kids)",
+        "price": 10,
+        "description": "Het offici\u00eble Kriko-M scouts t-shirt voor kinderen van stevig bordeaux katoen met ons logo groot op de rug en klein op de borst. Perfect voor speelzondagen!",
+        "sizes": [
+            "5/6 jaar",
+            "7/8 jaar (128)",
+            "9/11 jaar (140)",
+            "12/13 jaar (152)",
+            "14/15 jaar (164)"
+        ],
+        "image": "assets/images/shop/tshirt.jpg",
+        "category": "kledij",
+        "active": true
+    },
+    {
+        "id": "item_2",
+        "name": "Kriko-M T-shirt (Adults)",
+        "price": 15,
+        "description": "Het offici\u00eble Kriko-M scouts t-shirt voor volwassenen (S-XL) van bordeaux katoen met ons logo groot op de rug en klein op de borst.",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "image": "assets/images/shop/tshirt.jpg",
+        "category": "kledij",
+        "active": true
+    },
+    {
+        "id": "item_3",
+        "name": "Kriko-M Hoodie (Kids)",
+        "price": 30,
+        "description": "Onze heerlijke, warme bordeaux scouts hoodie met capuchon en buidelzak voor kinderen. Ideaal voor de koudere ochtenden of rond het kampvuur.",
+        "sizes": [
+            "7/8 jaar (128)",
+            "9/11 jaar (140)",
+            "12/13 jaar (152)",
+            "14/15 jaar (164)"
+        ],
+        "image": "assets/images/shop/hoodie.jpg",
+        "category": "kledij",
+        "active": true
+    },
+    {
+        "id": "item_4",
+        "name": "Kriko-M Hoodie (Adults)",
+        "price": 35,
+        "description": "Onze comfortabele en warme bordeaux scouts hoodie met capuchon voor volwassenen en oudere givers.",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "image": "assets/images/shop/hoodie.jpg",
+        "category": "kledij",
+        "active": true
+    },
+    {
+        "id": "item_5",
+        "name": "Kriko-M Groepsdas",
+        "price": 10,
+        "description": "De offici\u00eble tweekleurige groepsdas van Kriko-M (bordeaux met een beige boordje). Verplicht voor alle takken!",
+        "sizes": [
+            "E\u00e9n maat"
+        ],
+        "image": "assets/images/shop/das.jpg",
+        "category": "uniform",
+        "active": true
+    },
+    {
+        "id": "item_6",
+        "name": "Kriko Jaarkenteken",
+        "price": 2,
+        "description": "Het nieuwste jaarkenteken van Scouts en Gidsen Vlaanderen om op je hemd of das te naaien.",
+        "sizes": [
+            "Standaard"
+        ],
+        "image": "assets/images/shop/kenteken.jpg",
+        "category": "accessoires",
+        "active": true
+    }
+]

@@ -5,7 +5,7 @@
         "last_name": "Meyten",
         "email": "thomas.meyten24@gmail.com",
         "phone": "",
-        "password_hash": "$2y$12$CyK8bTymY6jD5x5Y4beZH.bi9.TNvbVOiYVOZOYk1rzbyi4/TSInC",
+        "password_hash": "$2y$12$fRNJ0XmsOY8J/BEBjqc5X.jl40JNKVHuy2iJzjIaq9DgKwxPRadsW",
         "children": [
             {
                 "id": "child_6a1bf19bb9c29",
@@ -30,8 +30,43 @@
                 "dob": "2012-03-20",
                 "tak": "jonggivers",
                 "warning": null
+            },
+            {
+                "id": "child_6a1c65fa68000",
+                "first_name": "Brecht Junior",
+                "last_name": "vs",
+                "dob": "2010-05-13",
+                "tak": "givers",
+                "warning": null
+            },
+            {
+                "id": "child_6a1c9f0c84df6",
+                "first_name": "Papa junior",
+                "last_name": "Meyten",
+                "dob": "2011-05-14",
+                "tak": "givers",
+                "warning": null
             }
         ],
         "created_at": "2026-05-31 08:29:26"
+    },
+    {
+        "id": "parent_6a1ca383027fe",
+        "first_name": "Liesbeth",
+        "last_name": "De Colvenaer",
+        "email": "liesbeth.decolvenaer@telenet.be",
+        "phone": "000",
+        "password_hash": "$2y$12$vUZsHPq8mnlfFIzlScVgF.vXPZLlgMAtYZLqUddFaptzA/IZJT9em",
+        "children": [
+            {
+                "id": "child_6a1ca39f2758d",
+                "first_name": "Sara Junior",
+                "last_name": "Meyten",
+                "dob": "2010-04-23",
+                "tak": "givers",
+                "warning": null
+            }
+        ],
+        "created_at": "2026-05-31 21:09:23"
     }
 ]

@@ -401,7 +401,7 @@ function init_db_defaults($db_name) {
                     'title' => 'Jaarlijkse BBQ & Eetdag',
                     'date' => '2026-11-15',
                     'time' => '11:30 - 19:30',
-                    'description' => 'Kom smullen op onze heerlijke jaarlijkse eetdag ten voordele van onze lokalen en tenten.',
+                    'description' => 'Kom smullen op onze heerlijke jaarlijkse eetdag ten voordele van ons lokaal en tenten.',
                     'location' => 'Grote Speelzaal College'
                 ]
             ];

@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Redirect if no active registration session exists
 if (!isset($_SESSION['last_registration'])) {
-    header('Location: evenementen.php');
+    header('Location: ouderportaal.php?show_evenementen=1');
     exit;
 }
 
@@ -145,7 +145,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
 
             <div style="text-align: center; display: flex; gap: 15px; justify-content: center;">
-                <a href="evenementen.php" class="btn btn-outline" style="padding: 10px 24px;">Nieuwe inschrijving</a>
+                <a href="ouderportaal.php?show_evenementen=1" class="btn btn-outline" style="padding: 10px 24px;">Nieuwe inschrijving</a>
                 <a href="index.php" class="btn btn-secondary" style="padding: 10px 24px;">Terug naar home</a>
             </div>
         </div>

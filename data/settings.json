@@ -3,7 +3,7 @@
     "accounts": {
         "groepsleiding": {
             "role_name": "Groepsleiding",
-            "password_hash": "$2y$12$zVfdf47vZ7Pi98QdMqukt.12k1NktFdIG.oC.HjOI.K9lr3OVVqxq"
+            "password_hash": "$2y$12$7pk/0eYPXfkDijkhWPV7LuVZ44k/lSMFbL1BAZ3RI7Rp4vk.lIj2K"
         },
         "kapoenen": {
             "role_name": "Kapoenenleiding",
@@ -29,7 +29,7 @@
     "contact_phone": "+32 471 31 37 78",
     "contact_address": "VP-plein (Industriepark Noord 33), 9100 Sint-Niklaas",
     "alert_message": "Welkom op de gloednieuwe website van Scouts Kriko-M! De inschrijvingen voor het nieuwe scoutsjaar zijn geopend.",
-    "alert_active": true,
+    "alert_active": false,
     "registration_fee_first": 50,
     "registration_fee_extra": 45,
     "takken": {
@@ -93,7 +93,7 @@
             "age_range": "8 - 11 jaar",
             "school_year": "3e, 4e & 5e leerjaar",
             "email": "welpenleiding@kriko-m.be",
-            "description": "Welpen duiken in de jungle! Ge\u00efnspireerd door de sfeer en verhalen van het Jungleboek beleven ze actieve spelen, leren ze scouts-vaardigheden, gaan ze op weekend en sluiten ze het scoutsjaar af met een geweldig 7-daags kamp in begin augustus!",
+            "description": "Welpen duiken in de jungle! Geïnspireerd door de sfeer en verhalen van het Jungleboek beleven ze actieve spelen, leren ze scouts-vaardigheden, gaan ze op weekend en sluiten ze het scoutsjaar af met een geweldig 7-daags kamp in begin augustus!",
             "uniform": "Welpen dragen geen volledig scoutsuniform. De tweekleurige groepsdas is verplicht. We raden ook ten zeerste aan om ons bordeaux Kriko-M T-shirt of de warme bordeaux Kriko-M trui te dragen.",
             "class": "welpen",
             "leaders": [

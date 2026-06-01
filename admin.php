@@ -28,6 +28,59 @@ if ($is_super) {
     }
 }
 
+/**
+ * Enforces the quota limit of maximum 2 approved Kriko Echo's per tak.
+ * If there are more than 2, the oldest approved echo is physically unlinked from disk
+ * and removed from the echos.json database.
+ */
+function enforce_echo_limit($tak) {
+    $echos = read_db('echos');
+    
+    // Extract approved echos for this tak
+    $approved_indices = [];
+    foreach ($echos as $index => $echo) {
+        if ($echo['tak'] === $tak && isset($echo['approved']) && $echo['approved'] === true) {
+            $approved_indices[$index] = $echo;
+        }
+    }
+    
+    // If we have more than 2 approved echos for this tak
+    if (count($approved_indices) > 2) {
+        // Sort approved echos by month/year descending so the newest ones are first
+        uasort($approved_indices, function($a, $b) {
+            $valA = ((int)$a['year'] * 100) + (int)$a['month'];
+            $valB = ((int)$b['year'] * 100) + (int)$b['month'];
+            if ($valA === $valB) {
+                return strtotime($b['uploaded_at']) - strtotime($a['uploaded_at']);
+            }
+            return $valB - $valA;
+        });
+        
+        // We keep the first 2. The rest must be deleted.
+        $kept_count = 0;
+        $to_delete_indices = [];
+        foreach ($approved_indices as $index => $echo) {
+            $kept_count++;
+            if ($kept_count > 2) {
+                $to_delete_indices[] = $index;
+            }
+        }
+        
+        // Now physically delete the files and remove from the list
+        foreach ($to_delete_indices as $index) {
+            $file_name = $echos[$index]['file_name'];
+            $file_path = UPLOADS_DIR . 'echos/' . $file_name;
+            if (!empty($file_name) && file_exists($file_path)) {
+                @unlink($file_path);
+            }
+            unset($echos[$index]);
+        }
+        
+        // Write the cleaned echos array back to database
+        write_db('echos', array_values($echos));
+    }
+}
+
 /* ==========================================================================
    1. POST / GET Request Operations
    ========================================================================== */
@@ -36,6 +89,69 @@ if ($is_super) {
 if (isset($_GET['action'])) {
     $action = $_GET['action'];
     $item_id = isset($_GET['id']) ? $_GET['id'] : '';
+    
+    // CSV Export Action (Super Admin / Tak Owner Check)
+    if ($action === 'download_csv' && isset($_GET['event'])) {
+        $event_title = trim($_GET['event']);
+        $regs = read_db('registrations');
+        
+        // Filter by role (security check)
+        if (!$is_super) {
+            $regs = array_filter($regs, function($r) use ($role) {
+                return $r['child_tak'] === $role;
+            });
+        }
+        
+        // Filter by event title
+        $event_regs = array_filter($regs, function($r) use ($event_title) {
+            return trim($r['activity_title']) === $event_title;
+        });
+        
+        // Prevent any error/deprecation messages from polluting the CSV output
+        error_reporting(0);
+        ini_set('display_errors', 0);
+        
+        // Clear any existing output buffer to prevent issues
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        // Output CSV
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="registraties-' . str_replace(' ', '-', strtolower($event_title)) . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        
+        // UTF-8 BOM for Excel compatibility
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+        
+        // Headers: Naam, Speciale Voorkeuren, Betaalstatus, Tak, Ouder, E-mail, Telefoon
+        fputcsv($output, ['Naam Kind', 'Tak', 'Speciale Voorkeuren / Opmerkingen', 'Betaalstatus', 'Ouder Naam', 'E-mail', 'Telefoon'], ';', '"', '\\');
+        
+        foreach ($event_regs as $r) {
+            $status_label = 'Niet betaald';
+            if ($r['status'] === 'paid') {
+                $status_label = 'Betaald';
+            } elseif ($r['status'] === 'waiting_approval') {
+                $status_label = 'Wacht op goedkeuring';
+            }
+            
+            $remarks = isset($r['remarks']) ? $r['remarks'] : '';
+            
+            fputcsv($output, [
+                $r['child_name'],
+                ucfirst($r['child_tak']),
+                $remarks,
+                $status_label,
+                $r['customer_name'],
+                $r['email'],
+                $r['phone']
+            ], ';', '"', '\\');
+        }
+        
+        fclose($output);
+        exit;
+    }
     
     // A. Super Admin Order status updates
     if (in_array($action, ['update_order', 'delete_order']) && !$is_super) {
@@ -75,15 +191,20 @@ if (isset($_GET['action'])) {
         }
         $echos = read_db('echos');
         $found = false;
+        $approved_tak = '';
         foreach ($echos as &$echo) {
             if ($echo['id'] === $item_id) {
                 $echo['approved'] = true;
+                $approved_tak = $echo['tak'];
                 $found = true;
                 break;
             }
         }
         if ($found) {
             write_db('echos', $echos);
+            if ($approved_tak) {
+                enforce_echo_limit($approved_tak);
+            }
             $success_alert = 'Kriko Echo planningsbrief succesvol goedgekeurd en gepubliceerd!';
         }
         $active_tab = 'echos';
@@ -269,6 +390,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     write_db('echos', $echos);
                     
                     if ($approved_status) {
+                        enforce_echo_limit($tak);
                         $success_alert = 'Kriko Echo succesvol geüpload en direct gepubliceerd!';
                     } else {
                         $success_alert = 'Kriko Echo succesvol geüpload! Deze wacht nu op goedkeuring van de groepsleiding.';
@@ -517,7 +639,7 @@ require_once __DIR__ . '/includes/header.php';
 </section>
 
 <!-- 2. Main Admin Dashboard Panel Grid -->
-<section class="section container">
+<section class="section container" id="admin-portal-wrapper">
     
     <!-- Success / Error notification alerts -->
     <?php if (!empty($success_alert)): ?>
@@ -627,9 +749,8 @@ require_once __DIR__ . '/includes/header.php';
         <!-- Right Content Tab panels -->
         <main>
             
-            <!-- PANEL 1: Bestellingen (Shop Orders) - Groepsleiding Only -->
             <?php if ($is_super): ?>
-                <div class="admin-panel <?php echo $active_tab === 'orders' ? 'active' : ''; ?>">
+                <div class="admin-panel <?php echo $active_tab === 'orders' ? 'active' : ''; ?>" data-tab="orders">
                     <div class="admin-panel-header">
                         <h3 style="font-size: 1.5rem; color: var(--color-primary-dark);">Webshop Kledij Bestellingen</h3>
                         <span style="font-size: 0.85rem; color: var(--color-text-muted);">Totaal geplaatst: <?php echo count($orders); ?> bestellingen</span>
@@ -683,7 +804,7 @@ require_once __DIR__ . '/includes/header.php';
                                                     <?php elseif ($order['status'] === 'paid'): ?>
                                                         <a href="admin.php?tab=orders&action=update_order&id=<?php echo $order['id']; ?>&status=completed" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.75rem;" title="Markeer als Geleverd">Geleverd</a>
                                                     <?php endif; ?>
-                                                    <a href="admin.php?tab=orders&action=delete_order&id=<?php echo $order['id']; ?>" onclick="return confirm('Bent u zeker dat u deze bestelling wilt verwijderen?')" class="btn btn-danger btn-icon" style="padding: 4px 8px; font-size: 0.75rem;" title="Verwijderen">
+                                                    <a href="admin.php?tab=orders&action=delete_order&id=<?php echo $order['id']; ?>" data-confirm="Bent u zeker dat u deze bestelling wilt verwijderen?" class="btn btn-danger btn-icon" style="padding: 4px 8px; font-size: 0.75rem;" title="Verwijderen">
                                                         &times;
                                                     </a>
                                                 </div>
@@ -710,7 +831,7 @@ require_once __DIR__ . '/includes/header.php';
             <?php endif; ?>
             
             <!-- PANEL 2: Kriko Echo's Manager (Upload & Archives) -->
-            <div class="admin-panel <?php echo $active_tab === 'echos' ? 'active' : ''; ?>">
+            <div class="admin-panel <?php echo $active_tab === 'echos' ? 'active' : ''; ?>" data-tab="echos">
                 <div class="admin-panel-header">
                     <h3 style="font-size: 1.5rem; color: var(--color-primary-dark);">
                         <?php echo $is_super ? "Upload & Beheer Planningsbrieven (Echo's)" : "Mijn Planningsbrieven (" . ucfirst($role) . ")"; ?>
@@ -758,7 +879,7 @@ require_once __DIR__ . '/includes/header.php';
                                                 <td>
                                                     <div style="display: flex; gap: 8px;">
                                                         <a href="admin.php?tab=echos&action=approve_echo&id=<?php echo $pe['id']; ?>" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem; background-color: var(--color-success);">Goedkeuren</a>
-                                                        <a href="admin.php?tab=echos&action=delete_echo&id=<?php echo $pe['id']; ?>" onclick="return confirm('Bent u zeker dat u deze planning wilt afwijzen en verwijderen?')" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem;">Afwijzen</a>
+                                                        <a href="admin.php?tab=echos&action=delete_echo&id=<?php echo $pe['id']; ?>" data-confirm="Bent u zeker dat u deze planning wilt afwijzen en verwijderen?" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem;">Afwijzen</a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -886,7 +1007,7 @@ require_once __DIR__ . '/includes/header.php';
                                             </a>
                                         </td>
                                         <td>
-                                            <a href="admin.php?tab=echos&action=delete_echo&id=<?php echo $echo['id']; ?>" onclick="return confirm('Bent u zeker dat u dit planningsbestand permanent wilt verwijderen?')" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;">
+                                            <a href="admin.php?tab=echos&action=delete_echo&id=<?php echo $echo['id']; ?>" data-confirm="Bent u zeker dat u dit planningsbestand permanent wilt verwijderen?" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;">
                                                 Verwijder
                                             </a>
                                         </td>
@@ -899,7 +1020,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
 
             <!-- PANEL 3: Tak Gegevens bewerken (Kapoenen, Welpen, etc.) -->
-            <div class="admin-panel <?php echo $active_tab === 'tak_settings' ? 'active' : ''; ?>">
+            <div class="admin-panel <?php echo $active_tab === 'tak_settings' ? 'active' : ''; ?>" data-tab="tak_settings">
                 <?php 
                 // Determine which tak we are editing
                 $edit_tak = $role;
@@ -1042,7 +1163,7 @@ require_once __DIR__ . '/includes/header.php';
             
             <!-- PANEL 4: Berichten Box (Messages Archive) - Groepsleiding Only -->
             <?php if ($is_super): ?>
-                <div class="admin-panel <?php echo $active_tab === 'messages' ? 'active' : ''; ?>">
+                <div class="admin-panel <?php echo $active_tab === 'messages' ? 'active' : ''; ?>" data-tab="messages">
                     <div class="admin-panel-header">
                         <h3 style="font-size: 1.5rem; color: var(--color-primary-dark);">Berichten Inbox (Contact Formulier)</h3>
                         <span style="font-size: 0.85rem; color: var(--color-text-muted);">Totaal ontvangen: <?php echo count($messages); ?> berichten</span>
@@ -1074,7 +1195,7 @@ require_once __DIR__ . '/includes/header.php';
                                         <?php if (!$msg['read']): ?>
                                             <a href="admin.php?tab=messages&action=read_message&id=<?php echo $msg['id']; ?>" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; background-color: var(--color-success);">Markeer als Gelezen</a>
                                         <?php endif; ?>
-                                        <a href="admin.php?tab=messages&action=delete_message&id=<?php echo $msg['id']; ?>" onclick="return confirm('Wilt u dit bericht permanent verwijderen?')" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;">Verwijder</a>
+                                        <a href="admin.php?tab=messages&action=delete_message&id=<?php echo $msg['id']; ?>" data-confirm="Wilt u dit bericht permanent verwijderen?" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;">Verwijder</a>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -1084,7 +1205,7 @@ require_once __DIR__ . '/includes/header.php';
             <?php endif; ?>
             
             <!-- PANEL 5: Instellingen (Settings & Configuration Panel) -->
-            <div class="admin-panel <?php echo $active_tab === 'settings' ? 'active' : ''; ?>">
+            <div class="admin-panel <?php echo $active_tab === 'settings' ? 'active' : ''; ?>" data-tab="settings">
                 <div class="admin-panel-header">
                     <h3 style="font-size: 1.5rem; color: var(--color-primary-dark);">
                         <?php echo $is_super ? "Website Instellingen & Beveiliging" : "Wachtwoord & Beveiliging Instellingen"; ?>
@@ -1247,7 +1368,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
             
             <!-- PANEL 6: Aankomende Activiteiten (Calendar) - Groepsleiding Only -->
-            <?php if ($is_super && $active_tab === 'calendar'): ?>
+            <?php if ($is_super): ?>
                 <?php 
                 // Check if we are editing an event
                 $edit_cal_id = isset($_GET['edit_cal']) ? $_GET['edit_cal'] : '';
@@ -1263,7 +1384,7 @@ require_once __DIR__ . '/includes/header.php';
                     }
                 }
                 ?>
-                <div class="admin-panel active">
+                <div class="admin-panel <?php echo $active_tab === 'calendar' ? 'active' : ''; ?>" data-tab="calendar">
                     <div class="admin-panel-header">
                         <h3 style="font-size: 1.5rem; color: var(--color-primary-dark);">
                             Aankomende Activiteiten (Homepagina)
@@ -1357,7 +1478,7 @@ require_once __DIR__ . '/includes/header.php';
                                                     <a href="admin.php?tab=calendar&edit_cal=<?php echo $item['id']; ?>" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem;" title="Bewerken">
                                                         Bewerk
                                                     </a>
-                                                    <a href="admin.php?tab=calendar&action=delete_calendar&id=<?php echo $item['id']; ?>" onclick="return confirm('Bent u zeker dat u deze activiteit wilt verwijderen?')" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" title="Verwijderen">
+                                                    <a href="admin.php?tab=calendar&action=delete_calendar&id=<?php echo $item['id']; ?>" data-confirm="Bent u zeker dat u deze activiteit wilt verwijderen?" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" title="Verwijderen">
                                                         Verwijder
                                                     </a>
                                                 </div>
@@ -1372,7 +1493,6 @@ require_once __DIR__ . '/includes/header.php';
             <?php endif; ?>
 
             <!-- PANEL 7: Activiteiten Inschrijvingen (Registrations) -->
-            <?php if ($active_tab === 'registrations'): ?>
                 <?php 
                 // Apply role filters
                 $filtered_regs = $registrations;
@@ -1397,7 +1517,7 @@ require_once __DIR__ . '/includes/header.php';
                     }
                 }
                 ?>
-                <div class="admin-panel active">
+                <div class="admin-panel <?php echo $active_tab === 'registrations' ? 'active' : ''; ?>" data-tab="registrations">
                     <div class="admin-panel-header">
                         <h3 style="font-size: 1.5rem; color: var(--color-primary-dark);">
                             <?php echo $is_super ? "Inschrijvingen Weekend & Kamp (Alle takken)" : "Inschrijvingen Tak: " . $_SESSION['admin_role_name']; ?>
@@ -1448,118 +1568,627 @@ require_once __DIR__ . '/includes/header.php';
                         <div style="background-color: var(--color-bg-linen); border: 1px solid var(--color-border); padding: 30px; border-radius: var(--border-radius-md); text-align: center; color: var(--color-text-muted);">
                             Er zijn geen inschrijvingen gevonden voor de geselecteerde filters.
                         </div>
-                    <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Inschrijfdatum</th>
-                                        <th>Kind (Tak)</th>
-                                        <th>Activiteit</th>
-                                        <th>Ouder / Contact</th>
-                                        <th>Betaling & Mededeling</th>
-                                        <th style="text-align: center;">Acties</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($filtered_regs as $reg): 
-                                        $reg_date = date('d-m-Y H:i', strtotime($reg['date']));
-                                        
-                                        $is_cancelled_req = isset($reg['cancellation_requested']) && $reg['cancellation_requested'] === true;
-                                        
-                                        if ($reg['status'] === 'paid') {
-                                            $status_class = 'status-badge paid';
-                                            $status_label = 'Betaald';
-                                            $row_bg = '';
-                                        } elseif ($reg['status'] === 'waiting_approval') {
-                                            $status_class = 'status-badge pending';
-                                            $status_label = 'Overgemaakt (Wacht op controle)';
-                                            $row_bg = 'background-color: hsla(38, 80%, 50%, 0.04); border-left: 4px solid var(--color-warning);';
-                                        } else {
-                                            $status_class = 'status-badge pending';
-                                            $status_label = 'Niet betaald';
-                                            $row_bg = '';
-                                        }
-                                        
-                                        if ($is_cancelled_req) {
-                                            $row_style = 'background-color: hsla(4, 75%, 48%, 0.05); border-left: 4px solid var(--color-error);';
-                                        } else {
-                                            $row_style = $row_bg;
-                                        }
-                                    ?>
-                                        <tr style="<?php echo $row_style; ?>">
-                                            <td style="font-size: 0.8rem; color: var(--color-text-muted);"><?php echo $reg_date; ?></td>
-                                            <td>
-                                                <strong style="color: var(--color-primary-dark); font-size: 1rem;"><?php echo htmlspecialchars($reg['child_name']); ?></strong><br>
-                                                <span class="status-badge" style="background-color: var(--color-bg-linen); color: var(--color-primary-dark); font-size: 0.7rem; margin-top: 4px;">
-                                                    <?php echo ucfirst(htmlspecialchars($reg['child_tak'])); ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span style="font-weight: 600; color: var(--color-text-dark);"><?php echo htmlspecialchars($reg['activity_title']); ?></span>
-                                            </td>
-                                            <td style="font-size: 0.85rem; line-height: 1.4;">
-                                                <strong>Ouder:</strong> <?php echo htmlspecialchars($reg['customer_name']); ?><br>
-                                                <strong>Email:</strong> <a href="mailto:<?php echo htmlspecialchars($reg['email']); ?>" style="color: var(--color-secondary);"><?php echo htmlspecialchars($reg['email']); ?></a><br>
-                                                <strong>Tel:</strong> <?php echo htmlspecialchars($reg['phone']); ?>
-                                                
-                                                <?php if (isset($reg['remarks']) && !empty($reg['remarks'])): ?>
-                                                    <div style="margin-top: 8px; font-size: 0.8rem; background-color: hsla(38, 80%, 50%, 0.08); border-left: 3px solid var(--color-warning); padding: 6px 10px; border-radius: 4px; color: var(--color-text-dark); line-height: 1.3;">
-                                                        <strong>Opmerking:</strong> <em>"<?php echo htmlspecialchars($reg['remarks']); ?>"</em>
-                                                    </div>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <strong style="color: var(--color-secondary);">€<?php echo number_format($reg['price'], 2, ',', ''); ?></strong><br>
-                                                <span class="<?php echo $status_class; ?>" style="font-size: 0.75rem; margin-top: 4px; margin-bottom: 4px; display: inline-block;">
-                                                    <?php echo $status_label; ?>
-                                                </span><br>
-                                                
-                                                <?php if ($is_cancelled_req): ?>
-                                                    <span style="background-color: hsla(4, 75%, 48%, 0.1); border: 1px solid var(--color-error); color: var(--color-error); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; display: inline-block; margin-bottom: 4px; text-transform: uppercase;">
-                                                        ⚠️ Annulering Aangevraagd
-                                                    </span><br>
-                                                <?php endif; ?>
-                                                
-                                                <span style="font-family: monospace; font-size: 0.8rem; background-color: var(--color-bg-linen); padding: 2px 6px; border-radius: 4px; display: inline-block; color: var(--color-text-dark); font-weight: bold; border: 1px solid var(--color-border);">
-                                                    <?php echo htmlspecialchars($reg['communication']); ?>
-                                                </span>
-                                            </td>
-                                            <td style="text-align: center;">
-                                                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: center;">
-                                                    <?php if ($reg['status'] !== 'paid'): ?>
-                                                        <a href="admin.php?tab=registrations&action=update_registration&id=<?php echo $reg['id']; ?>&status=paid" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; background-color: var(--color-success); width: 100%; text-align: center;">
-                                                            Markeer Betaald
-                                                        </a>
-                                                    <?php else: ?>
-                                                        <a href="admin.php?tab=registrations&action=update_registration&id=<?php echo $reg['id']; ?>&status=pending" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; width: 100%; text-align: center;">
-                                                            Markeer Open
-                                                        </a>
+                    <?php else: 
+                        // Group registrations dynamically by event/activity
+                        $regs_by_event = [];
+                        foreach ($filtered_regs as $reg) {
+                            $event_title = $reg['activity_title'];
+                            if (!isset($regs_by_event[$event_title])) {
+                                $regs_by_event[$event_title] = [];
+                            }
+                            $regs_by_event[$event_title][] = $reg;
+                        }
+                        
+                        foreach ($regs_by_event as $event_title => $event_regs):
+                            $event_count = count($event_regs);
+                    ?>
+                        <div style="background-color: var(--color-bg-white); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--color-border); padding: 24px; margin-bottom: 40px;" class="tak-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 16px;">
+                                <div>
+                                    <h4 style="font-size: 1.35rem; color: var(--color-primary-dark); font-family: 'Outfit', sans-serif; font-weight: 700; margin: 0;"><?php echo htmlspecialchars($event_title); ?></h4>
+                                    <span style="font-size: 0.85rem; color: var(--color-text-muted);">
+                                        Aantal inschrijvingen: <strong><?php echo $event_count; ?></strong>
+                                    </span>
+                                </div>
+                                
+                                <!-- CSV Export Button -->
+                                <a href="admin.php?action=download_csv&event=<?php echo urlencode($event_title); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 0.85rem; font-family: 'Outfit', sans-serif; font-weight: 600; text-decoration: none; border-radius: 30px; background-color: var(--color-success); border-color: var(--color-success);">
+                                    <svg style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Download CSV
+                                </a>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="admin-table" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Inschrijfdatum</th>
+                                            <th>Kind (Tak)</th>
+                                            <th>Ouder / Contact</th>
+                                            <th>Betaling & Mededeling</th>
+                                            <th style="text-align: center;">Acties</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($event_regs as $reg): 
+                                            $reg_date = date('d-m-Y H:i', strtotime($reg['date']));
+                                            $is_cancelled_req = isset($reg['cancellation_requested']) && $reg['cancellation_requested'] === true;
+                                            
+                                            if ($reg['status'] === 'paid') {
+                                                $status_class = 'status-badge paid';
+                                                $status_label = 'Betaald';
+                                                $row_bg = '';
+                                            } elseif ($reg['status'] === 'waiting_approval') {
+                                                $status_class = 'status-badge pending';
+                                                $status_label = 'Overgemaakt (Wacht op controle)';
+                                                $row_bg = 'background-color: hsla(38, 80%, 50%, 0.04); border-left: 4px solid var(--color-warning);';
+                                            } else {
+                                                $status_class = 'status-badge pending';
+                                                $status_label = 'Niet betaald';
+                                                $row_bg = '';
+                                            }
+                                            
+                                            if ($is_cancelled_req) {
+                                                $row_style = 'background-color: hsla(4, 75%, 48%, 0.05); border-left: 4px solid var(--color-error);';
+                                            } else {
+                                                $row_style = $row_bg;
+                                            }
+                                        ?>
+                                            <tr style="<?php echo $row_style; ?>">
+                                                <td style="font-size: 0.8rem; color: var(--color-text-muted);"><?php echo $reg_date; ?></td>
+                                                <td>
+                                                    <strong style="color: var(--color-primary-dark); font-size: 1rem;"><?php echo htmlspecialchars($reg['child_name']); ?></strong><br>
+                                                    <span class="status-badge" style="background-color: var(--color-bg-linen); color: var(--color-primary-dark); font-size: 0.7rem; margin-top: 4px;">
+                                                        <?php echo ucfirst(htmlspecialchars($reg['child_tak'])); ?>
+                                                    </span>
+                                                </td>
+                                                <td style="font-size: 0.85rem; line-height: 1.4;">
+                                                    <strong>Ouder:</strong> <?php echo htmlspecialchars($reg['customer_name']); ?><br>
+                                                    <strong>Email:</strong> <a href="mailto:<?php echo htmlspecialchars($reg['email']); ?>" style="color: var(--color-secondary);"><?php echo htmlspecialchars($reg['email']); ?></a><br>
+                                                    <strong>Tel:</strong> <?php echo htmlspecialchars($reg['phone']); ?>
+                                                    
+                                                    <?php if (isset($reg['remarks']) && !empty($reg['remarks'])): ?>
+                                                        <div style="margin-top: 8px; font-size: 0.8rem; background-color: hsla(38, 80%, 50%, 0.08); border-left: 3px solid var(--color-warning); padding: 6px 10px; border-radius: 4px; color: var(--color-text-dark); line-height: 1.3;">
+                                                            <strong>Opmerking:</strong> <em>"<?php echo htmlspecialchars($reg['remarks']); ?>"</em>
+                                                        </div>
                                                     <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <strong style="color: var(--color-secondary);">€<?php echo number_format($reg['price'], 2, ',', ''); ?></strong><br>
+                                                    <span class="<?php echo $status_class; ?>" style="font-size: 0.75rem; margin-top: 4px; margin-bottom: 4px; display: inline-block;">
+                                                        <?php echo $status_label; ?>
+                                                    </span><br>
                                                     
                                                     <?php if ($is_cancelled_req): ?>
-                                                        <a href="admin.php?tab=registrations&action=delete_registration&id=<?php echo $reg['id']; ?>" onclick="return confirm('Bent u zeker dat u deze inschrijving wilt annuleren en definitief wilt verwijderen uit het systeem?')" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; width: 100%; text-align: center; font-weight: bold; background-color: var(--color-error);">
-                                                            Annulering Goedkeuren
-                                                        </a>
-                                                    <?php else: ?>
-                                                        <a href="admin.php?tab=registrations&action=delete_registration&id=<?php echo $reg['id']; ?>" onclick="return confirm('Bent u zeker dat u deze inschrijving definitief wilt verwijderen?')" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; width: 100%; text-align: center;">
-                                                            Verwijder
-                                                        </a>
+                                                        <span style="background-color: hsla(4, 75%, 48%, 0.1); border: 1px solid var(--color-error); color: var(--color-error); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; display: inline-block; margin-bottom: 4px; text-transform: uppercase;">
+                                                            ⚠️ Annulering Aangevraagd
+                                                        </span><br>
                                                     <?php endif; ?>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                                    
+                                                    <span style="font-family: monospace; font-size: 0.8rem; background-color: var(--color-bg-linen); padding: 2px 6px; border-radius: 4px; display: inline-block; color: var(--color-text-dark); font-weight: bold; border: 1px solid var(--color-border);">
+                                                        <?php echo htmlspecialchars($reg['communication']); ?>
+                                                    </span>
+                                                </td>
+                                                <td style="text-align: center;">
+                                                    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: center;">
+                                                        <?php if ($reg['status'] !== 'paid'): ?>
+                                                            <a href="admin.php?tab=registrations&action=update_registration&id=<?php echo $reg['id']; ?>&status=paid" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; background-color: var(--color-success); width: 100%; text-align: center;">
+                                                                Markeer Betaald
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <a href="admin.php?tab=registrations&action=update_registration&id=<?php echo $reg['id']; ?>&status=pending" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; width: 100%; text-align: center;">
+                                                                Markeer Open
+                                                            </a>
+                                                        <?php endif; ?>
+                                                        
+                                                        <?php if ($is_cancelled_req): ?>
+                                                            <a href="admin.php?tab=registrations&action=delete_registration&id=<?php echo $reg['id']; ?>" data-confirm="Bent u zeker dat u deze inschrijving wilt annuleren en definitief wilt verwijderen uit het systeem?" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; width: 100%; text-align: center; font-weight: bold; background-color: var(--color-error);">
+                                                                Annulering Goedkeuren
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <a href="admin.php?tab=registrations&action=delete_registration&id=<?php echo $reg['id']; ?>" data-confirm="Bent u zeker dat u deze inschrijving definitief wilt verwijderen?" class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem; width: 100%; text-align: center;">
+                                                                Verwijder
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
                 </div>
-            <?php endif; ?>
             
         </main>
         
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Inject Glassmorphic Toast Styles
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            min-width: 320px;
+            max-width: 480px;
+            padding: 16px 20px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
+            color: var(--color-text-dark);
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transform: translateY(-20px) scale(0.9);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .toast.show {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        .toast.success {
+            border-left: 5px solid var(--color-success);
+        }
+        .toast.error {
+            border-left: 5px solid var(--color-error);
+        }
+        .toast-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .toast-icon.success {
+            background-color: hsla(145, 63%, 35%, 0.1);
+            color: var(--color-success);
+        }
+        .toast-icon.error {
+            background-color: hsla(4, 75%, 48%, 0.1);
+            color: var(--color-error);
+        }
+        .toast-message {
+            font-size: 0.95rem;
+            font-weight: 600;
+            flex-grow: 1;
+            line-height: 1.4;
+        }
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            margin-left: 8px;
+        }
+        .toast-close:hover {
+            opacity: 1;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            border-radius: var(--border-radius-lg);
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--color-border);
+            border-top: 4px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(styleEl);
+
+    // 2. Create Toast Container
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+
+    // 3. Show Toast Function
+    window.showToast = function(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const iconSVG = type === 'success' 
+            ? `<svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>`
+            : `<svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            
+        toast.innerHTML = `
+            <div class="toast-icon ${type}">${iconSVG}</div>
+            <div class="toast-message">${message}</div>
+            <button class="toast-close">&times;</button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Trigger reflow & show
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        const closeBtn = toast.querySelector('.toast-close');
+        const dismissToast = () => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        };
+        
+        closeBtn.addEventListener('click', dismissToast);
+        
+        // Auto-dismiss after 3.5s
+        setTimeout(dismissToast, 3500);
+    };
+
+    // 3b. Show Confirm Modal Function
+    window.showConfirmModal = function(message, onConfirm) {
+        let modal = document.getElementById('scouts-confirm-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'scouts-confirm-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(15, 23, 42, 0.45);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 11000;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: var(--color-bg-white);
+                    border: 1px solid var(--color-border);
+                    border-radius: var(--border-radius-lg);
+                    box-shadow: var(--shadow-lg);
+                    padding: 30px;
+                    max-width: 450px;
+                    width: 90%;
+                    text-align: center;
+                    transform: translateY(20px) scale(0.95);
+                    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    font-family: 'Outfit', sans-serif;
+                ">
+                    <div style="
+                        width: 60px;
+                        height: 60px;
+                        background-color: hsla(4, 75%, 48%, 0.1);
+                        color: var(--color-error);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto 20px;
+                    ">
+                        <svg style="width: 32px; height: 32px; fill: none; stroke: currentColor; stroke-width: 2.5;" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h4 style="margin: 0 0 10px; color: var(--color-primary-dark); font-size: 1.35rem; font-weight: 700; font-family: 'Outfit', sans-serif;">Bent u zeker?</h4>
+                    <p id="scouts-confirm-message" style="color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.5; margin: 0 0 25px; font-family: 'Plus Jakarta Sans', sans-serif;"></p>
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button id="scouts-confirm-cancel" class="btn btn-outline" style="padding: 10px 20px; font-size: 0.9rem; min-width: 110px; cursor: pointer; border-radius: 30px; font-weight: 600; font-family: 'Outfit', sans-serif;">Annuleren</button>
+                        <button id="scouts-confirm-ok" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.9rem; min-width: 110px; background-color: var(--color-error); border-color: var(--color-error); color: #ffffff !important; cursor: pointer; border-radius: 30px; font-weight: 600; font-family: 'Outfit', sans-serif;">Bevestigen</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        const messageEl = modal.querySelector('#scouts-confirm-message');
+        messageEl.textContent = message;
+
+        const cancelBtn = modal.querySelector('#scouts-confirm-cancel');
+        const okBtn = modal.querySelector('#scouts-confirm-ok');
+        const innerContent = modal.querySelector('div');
+
+        const hideModal = () => {
+            modal.style.opacity = '0';
+            modal.style.pointerEvents = 'none';
+            innerContent.style.transform = 'translateY(20px) scale(0.95)';
+        };
+
+        const showModal = () => {
+            modal.style.opacity = '1';
+            modal.style.pointerEvents = 'auto';
+            innerContent.style.transform = 'translateY(0) scale(1)';
+        };
+
+        // Clean listeners
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        const newOkBtn = okBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+
+        newCancelBtn.addEventListener('click', hideModal);
+        newOkBtn.addEventListener('click', () => {
+            hideModal();
+            if (typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        });
+
+        setTimeout(showModal, 10);
+    };
+
+    // 4. Tab Switcher Logic
+    window.switchTab = function(tab) {
+        // Toggle menu active classes
+        document.querySelectorAll('.admin-menu-btn').forEach(btn => {
+            const href = btn.getAttribute('href');
+            if (!href) return;
+            const url = new URL(href, window.location.origin);
+            if (url.searchParams.get('tab') === tab) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // Toggle panel active classes
+        document.querySelectorAll('.admin-panel').forEach(panel => {
+            if (panel.getAttribute('data-tab') === tab) {
+                panel.classList.add('active');
+            } else {
+                panel.classList.remove('active');
+            }
+        });
+    };
+
+    // 5. Handle Back/Forward Navigation
+    window.addEventListener('popstate', function(e) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab') || 'orders';
+        switchTab(tab);
+    });
+
+    // 6. Loading Overlay
+    function toggleLoading(show) {
+        let overlay = document.querySelector('.loading-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = '<div class="spinner"></div>';
+            const wrapper = document.querySelector('#admin-portal-wrapper');
+            if (wrapper) {
+                wrapper.style.position = 'relative';
+                wrapper.appendChild(overlay);
+            }
+        }
+        if (show) {
+            overlay.classList.add('active');
+        } else {
+            overlay.classList.remove('active');
+        }
+    }
+
+    // 7. Parse and Extract Alerts from HTML
+    function checkAndShowAlerts(doc) {
+        // Find success alert in returned HTML
+        const successDiv = doc.querySelector('div[style*="var(--color-success)"]');
+        if (successDiv) {
+            const msg = successDiv.querySelector('span')?.textContent || successDiv.textContent.trim();
+            showToast(msg, 'success');
+            // Remove success alert from DOM to keep UI extremely clean
+            successDiv.remove();
+        }
+        
+        // Find error alert in returned HTML
+        const errorDiv = doc.querySelector('div[style*="var(--color-error)"]');
+        if (errorDiv) {
+            const msg = errorDiv.querySelector('span')?.textContent || errorDiv.textContent.trim();
+            showToast(msg, 'error');
+            errorDiv.remove();
+        }
+    }
+
+    // 8. Event Delegation - Clicks
+    document.addEventListener('click', function(e) {
+        // A. Tab buttons
+        const menuBtn = e.target.closest('.admin-menu-btn');
+        if (menuBtn && !menuBtn.style.color.includes('var(--color-error)') && !menuBtn.href.includes('logout')) {
+            const href = menuBtn.getAttribute('href');
+            if (href && href.includes('tab=')) {
+                e.preventDefault();
+                const url = new URL(href, window.location.origin);
+                const tab = url.searchParams.get('tab');
+                switchTab(tab);
+                history.pushState({ tab: tab }, '', href);
+                return;
+            }
+        }
+
+        // B. Action buttons (GET requests)
+        const actionLink = e.target.closest('a');
+        if (actionLink && !e.defaultPrevented) {
+            const href = actionLink.getAttribute('href');
+            if (href && href.includes('admin.php') && href.includes('action=')) {
+                const url = new URL(href, window.location.origin);
+                const action = url.searchParams.get('action');
+                
+                // Exclude download_csv and logout from AJAX
+                if (action && action !== 'download_csv' && action !== 'logout') {
+                    e.preventDefault();
+                    
+                    const activeTab = new URLSearchParams(window.location.search).get('tab') || 'orders';
+                    url.searchParams.set('tab', activeTab);
+                    
+                    const performAction = () => {
+                        toggleLoading(true);
+                        fetch(url.toString())
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const newWrapper = doc.querySelector('#admin-portal-wrapper');
+                                const currentWrapper = document.querySelector('#admin-portal-wrapper');
+                                
+                                if (newWrapper && currentWrapper) {
+                                    checkAndShowAlerts(doc);
+                                    currentWrapper.innerHTML = newWrapper.innerHTML;
+                                    // Keep the current tab active
+                                    switchTab(activeTab);
+                                }
+                            })
+                            .catch(err => {
+                                console.error('AJAX Action failed:', err);
+                                showToast('Actie mislukt. Probeer het opnieuw.', 'error');
+                            })
+                            .finally(() => {
+                                toggleLoading(false);
+                            });
+                    };
+                    
+                    const confirmMsg = actionLink.getAttribute('data-confirm');
+                    if (confirmMsg) {
+                        showConfirmModal(confirmMsg, performAction);
+                    } else {
+                        performAction();
+                    }
+                }
+            }
+        }
+    });
+
+    // 9. Event Delegation - Form Submissions
+    document.addEventListener('submit', function(e) {
+        const form = e.target.closest('form');
+        if (form) {
+            const actionAttr = form.getAttribute('action') || '';
+            if (actionAttr.includes('admin.php') || actionAttr === '') {
+                e.preventDefault();
+                
+                toggleLoading(true);
+                
+                const formData = new FormData(form);
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+                
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = 'Verwerken...';
+                }
+                
+                // Form action URL
+                const actionUrl = new URL(actionAttr || window.location.href, window.location.origin);
+                
+                // Append active tab to POST action URL so server renders the correct panel as active
+                const activeTab = new URLSearchParams(window.location.search).get('tab') || 'orders';
+                actionUrl.searchParams.set('tab', activeTab);
+                
+                // If it is a GET form (like registrations search filters), we submit via GET fetch
+                const isGet = form.getAttribute('method')?.toUpperCase() === 'GET';
+                let fetchPromise;
+                
+                if (isGet) {
+                    const searchParams = new URLSearchParams(formData);
+                    actionUrl.search = searchParams.toString();
+                    fetchPromise = fetch(actionUrl.toString());
+                } else {
+                    fetchPromise = fetch(actionUrl.toString(), {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+                
+                fetchPromise
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newWrapper = doc.querySelector('#admin-portal-wrapper');
+                        const currentWrapper = document.querySelector('#admin-portal-wrapper');
+                        
+                        if (newWrapper && currentWrapper) {
+                            checkAndShowAlerts(doc);
+                            currentWrapper.innerHTML = newWrapper.innerHTML;
+                            
+                            // Re-apply correct active tab
+                            const activeSidebarBtn = doc.querySelector('.admin-menu-btn.active');
+                            let targetTab = activeTab;
+                            if (activeSidebarBtn) {
+                                const newBtnUrl = new URL(activeSidebarBtn.getAttribute('href'), window.location.origin);
+                                targetTab = newBtnUrl.searchParams.get('tab') || activeTab;
+                            }
+                            switchTab(targetTab);
+                            
+                            // Update browser URL
+                            const newSearch = new URLSearchParams(window.location.search);
+                            newSearch.set('tab', targetTab);
+                            history.pushState({ tab: targetTab }, '', `admin.php?${newSearch.toString()}`);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Form submission failed:', err);
+                        showToast('Formulier verzenden mislukt.', 'error');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                        }
+                    })
+                    .finally(() => {
+                        toggleLoading(false);
+                    });
+            }
+        }
+    });
+});
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

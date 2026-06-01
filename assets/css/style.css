@@ -12,6 +12,7 @@
     --color-primary: hsl(345, 60%, 20%);       /* Deep Bordeaux */
     --color-primary-light: hsl(345, 50%, 30%);
     --color-primary-dark: hsl(345, 70%, 12%);
+    --color-primary-hover: hsl(345, 50%, 28%);
     --color-secondary: hsl(35, 45%, 72%);      /* Scouts Beige / Gold */
     --color-secondary-hover: hsl(35, 50%, 64%);
     --color-accent: hsl(35, 65%, 68%);         /* Scouts Accent Sand */
@@ -217,18 +218,40 @@ a {
 .logo-link {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    text-decoration: none;
 }
 
 .logo-img {
-    height: 50px;
-    width: auto;
+    height: 56px;
+    width: 56px;
+    border-radius: 50%;
+    border: 2px solid var(--color-accent);
+    background-color: var(--color-bg-white);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.logo-link:hover .logo-img {
+    transform: scale(1.12) rotate(6deg);
+    border-color: var(--color-bg-white);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
 }
 
 .logo-text h1 {
-    font-size: 1.5rem;
+    font-size: 1.85rem;
     color: var(--color-bg-white);
     letter-spacing: -0.5px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1;
+    margin: 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.logo-link:hover .logo-text h1 {
+    color: var(--color-accent);
+    transform: translateX(3px);
 }
 
 .logo-text span {

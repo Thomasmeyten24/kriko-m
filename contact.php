@@ -116,7 +116,7 @@ require_once __DIR__ . '/includes/header.php';
         <div style="display: flex; flex-direction: column; gap: 24px;">
             <!-- Address details -->
             <div class="checkout-card" style="background-color: var(--color-bg-white);">
-                <h3 style="font-size: 1.4rem; border-bottom: 2px solid var(--color-bg-linen); padding-bottom: 8px; margin-bottom: 16px; color: var(--color-primary-dark);">Onze Lokalen</h3>
+                <h3 style="font-size: 1.4rem; border-bottom: 2px solid var(--color-bg-linen); padding-bottom: 8px; margin-bottom: 16px; color: var(--color-primary-dark);">Ons Lokaal</h3>
                 <p style="font-size: 0.95rem; color: var(--color-text-dark); margin-bottom: 20px; line-height: 1.5;">
                     Onze scoutsruimten bevinden zich in het noorden van Sint-Niklaas. We beschikken over een prachtig speelterrein op het VP-plein en uitstekende binnenlokalen.
                 </p>

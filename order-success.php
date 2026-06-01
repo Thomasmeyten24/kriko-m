@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Redirect to shop if no session order is active
 if (!isset($_SESSION['last_order'])) {
-    header('Location: shop.php');
+    header('Location: ouderportaal.php');
     exit;
 }
 
@@ -37,7 +37,7 @@ require_once __DIR__ . '/includes/header.php';
     
     <h2 style="font-size: 2.25rem; color: var(--color-primary-dark); margin-bottom: 8px;">Bedankt voor je bestelling!</h2>
     <p style="color: var(--color-text-muted); font-size: 1.1rem; line-height: 1.5;">
-        We hebben je bestelling goed ontvangen onder nummer **<?php echo htmlspecialchars($order['id']); ?>**. Volg de onderstaande stappen om de betaling via overschrijving te voldoen.
+        We hebben je bestelling goed ontvangen onder nummer <strong><?php echo htmlspecialchars($order['id']); ?></strong>. Volg de onderstaande stappen om de betaling via overschrijving te voldoen.
     </p>
 </section>
 
@@ -52,7 +52,7 @@ require_once __DIR__ . '/includes/header.php';
             
             <h3 style="font-size: 1.6rem; color: var(--color-primary-dark); margin-bottom: 16px;">Overschrijving Gegevens</h3>
             <p style="font-size: 0.95rem; color: var(--color-text-muted); margin-bottom: 24px; line-height: 1.5;">
-                Gelieve de betaling uit te voeren via uw bankapp met de onderstaande details. **Vermeld exact de gestructureerde mededeling** voor een automatische koppeling!
+                Gelieve de betaling uit te voeren via uw bankapp met de onderstaande details. <strong>Vermeld exact de gestructureerde mededeling</strong> voor een automatische koppeling!
             </p>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 28px;">
@@ -130,7 +130,7 @@ require_once __DIR__ . '/includes/header.php';
                 </svg>
                 Afdrukken / Opslaan
             </button>
-            <a href="shop.php" class="btn btn-secondary">Terug naar de winkel</a>
+            <a href="ouderportaal.php?show_webshop=1" class="btn btn-secondary">Terug naar de winkel</a>
         </div>
         
     </div>

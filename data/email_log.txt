@@ -1,1 +1,399 @@
 [2026-05-31 08:21:28] To: thomas.meyten24@gmail.com | Link: http://localhost:8000//reset-password.php?token=aacbd128d27750510886a13d4bed4d41
+[2026-05-31 20:03:51] TO: test.parent@kriko-m.be | SUBJECT: Mailpit Test-Overschrijving
+BODY:
+
+    📬 Hallo Test-Gebruiker,
+    Dit is een succesvolle test-email verzonden vanaf het **Scouts Kriko-M Web Platform** om uw lokale **Mailpit** mail-configuratie te controleren!
+    
+    Als u dit bericht ziet, betekent dit dat de SMTP-socketkoppeling op poort 1025 perfect functioneert. U bent nu helemaal klaar om de volledige workflow (wachtwoordherstel, bestellingen en inschrijvingen) lokaal te testen.
+    
+    
+        🎉 Mailpit SMTP-Status: Actief!
+        De e-mail is via direct sockets getransmiteerd naar 127.0.0.1:1025.
+    
+    
+    Gebruik de onderstaande knop om terug te keren naar de site:
+    
+        Naar Ouderportaal
+    
+    
+    Met sportieve scouts-groeten,De Dev-Leiding
+    
+============================================================
+[2026-05-31 20:04:56] TO: thomas.meyten24@gmail.com | SUBJECT: Scouts Kriko-M - Wachtwoord Herstellen
+BODY:
+Beste Groepsleiding,
+            Er is een verzoek ingediend om het wachtwoord van het groepsleiding-account te herstellen.
+            Klik op de onderstaande knop om uw wachtwoord opnieuw in te stellen. Deze link is **1 uur geldig**:
+            
+            
+                Wachtwoord Herstellen
+            
+            
+            Als de knop niet werkt, kunt u ook de volgende link kopiëren en plakken in uw browser:
+            http://localhost:8000//reset-password.php?token=f8ffb5424b267ff84fa2e7da117b22fa
+            
+            Indien u dit verzoek niet zelf heeft ingediend, kunt u deze e-mail veilig negeren. Er worden geen wijzigingen aan uw account aangebracht.
+            Met vriendelijke groeten,Scouts Kriko-M
+============================================================
+[2026-05-31 20:07:54] TO: thomas.meyten24@gmail.com | SUBJECT: Bestelbevestiging #ord_6a1c951adecf9 - Scouts Kriko-M Webshop
+BODY:
+Beste Thomas Meyten,
+        Bedankt voor uw bestelling bij de Scouts Kriko-M Webshop! We hebben uw bestelling succesvol ontvangen onder bestellingsnummer: ord_6a1c951adecf9.
+        
+        Gelieve de betaling van €10,00 handmatig via overschrijving te voldoen met de onderstaande details:
+        
+        
+            💳 Overschrijving details
+            
+                Begunstigde: Scouts Kriko-M
+                IBAN-nummer: BE59 7360 6413 2626
+                Bedrag: €10,00
+                Gestructureerde mededeling: +++597/1052/64675+++
+            
+            ⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch verwerken.
+        
+        
+        Bestelde artikelen
+        
+            
+                
+                    Artikel
+                    Prijs
+                
+            
+            
+                
+                1x Kriko-M T-shirt (Kids) (Maat: 5/6 jaar)
+                €10,00
+            
+                
+                    TOTAAL BEDRAG:
+                    €10,00
+                
+            
+        
+        
+        Zodra wij uw betaling goed ontvangen, ligt de bestelling de eerstvolgende zondag na de meeting voor u klaar aan de lokalen (VP-plein)!
+        U kunt de actuele status van uw bestelling ook te allen tijde opvolgen via het Ouderportaal.
+============================================================
+[2026-05-31 20:18:43] TO: thomas.meyten24@gmail.com | SUBJECT: Inschrijving Bevestiging: Welpen Zomerkamp - Scouts Kriko-M
+BODY:
+Beste Thomas Meyten,
+                    Gefeliciteerd! Uw inschrijving voor Welpen Zomerkamp is succesvol geregistreerd voor uw kind: Thomas Junior Meyten.
+                    
+                    Gelieve de deelnamebijdrage van €95,00 handmatig via overschrijving te voldoen met de onderstaande details:
+                    
+                    
+                        💳 Overschrijving details
+                        
+                            Begunstigde: Scouts Kriko-M
+                            IBAN-nummer: BE59 7360 6413 2626
+                            Bedrag: €95,00
+                            Gestructureerde mededeling: +++159/6721/62162+++
+                        
+                        ⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch koppelen aan de inschrijving.
+                    
+                    
+                    Inschrijving samenvatting
+                    
+                        
+                            
+                                Deelnemer
+                                Tak
+                                Prijs
+                            
+                        
+                        
+                            
+                                Thomas Junior Meyten
+                                Welpen
+                                €95,00
+                            
+                        
+                    
+                            Opmerkingen / Medische info:
+                            tester
+                        Zodra we uw overschrijving ontvangen, keurt de takleiding de inschrijving goed. U kunt de status en betalingsbevestiging te allen tijde opvolgen via het Ouderportaal.
+                    We kijken er alvast enorm naar uit om er een geweldig avontuur van te maken!
+============================================================
+[2026-05-31 20:23:01] TO: thomas.meyten24@gmail.com | SUBJECT: Scouts Kriko-M - Wachtwoord Herstellen
+BODY:
+Beste Thomas Meyten,
+            Er is een verzoek ingediend om het wachtwoord van uw ouderaccount op het Scouts Kriko-M Ouderportaal te herstellen.
+            Klik op de onderstaande knop om uw wachtwoord opnieuw in te stellen. Deze link is 1 uur geldig:
+            
+            
+                Wachtwoord Herstellen
+            
+            
+            Als de knop niet werkt, kunt u ook de volgende link kopiëren en plakken in uw browser:
+            http://localhost:8000//reset-password.php?token=7cfa4ea93408a1474b0311dd5fc494c4
+            
+            Indien u dit verzoek niet zelf heeft ingediend, kunt u deze e-mail veilig negeren. Er worden geen wijzigingen aan uw account aangebracht.
+            Met vriendelijke groeten,Scouts Kriko-M
+============================================================
+[2026-05-31 20:23:49] TO: thomas.meyten24@gmail.com | SUBJECT: Scouts Kriko-M - Wachtwoord Herstellen
+BODY:
+Beste Thomas Meyten,
+            Er is een verzoek ingediend om het wachtwoord van uw ouderaccount op het Scouts Kriko-M Ouderportaal te herstellen.
+            Klik op de onderstaande knop om uw wachtwoord opnieuw in te stellen. Deze link is 1 uur geldig:
+            
+            
+                Wachtwoord Herstellen
+            
+            
+            Als de knop niet werkt, kunt u ook de volgende link kopiëren en plakken in uw browser:
+            http://localhost:8000//reset-password.php?token=7082a29e75d9a14134b5f89cc246611c
+            
+            Indien u dit verzoek niet zelf heeft ingediend, kunt u deze e-mail veilig negeren. Er worden geen wijzigingen aan uw account aangebracht.
+            Met vriendelijke groeten,Scouts Kriko-M
+============================================================
+[2026-05-31 20:24:25] TO: thomas.meyten24@gmail.com | SUBJECT: Scouts Kriko-M - Wachtwoord Herstellen
+BODY:
+Beste Thomas Meyten,
+            Er is een verzoek ingediend om het wachtwoord van uw ouderaccount op het Scouts Kriko-M Ouderportaal te herstellen.
+            Klik op de onderstaande knop om uw wachtwoord opnieuw in te stellen. Deze link is 1 uur geldig:
+            
+            
+                Wachtwoord Herstellen
+            
+            
+            Als de knop niet werkt, kunt u ook de volgende link kopiëren en plakken in uw browser:
+            http://localhost:8000//reset-password.php?token=0ef83c70cef695b3da98751248caad2f
+            
+            Indien u dit verzoek niet zelf heeft ingediend, kunt u deze e-mail veilig negeren. Er worden geen wijzigingen aan uw account aangebracht.
+            Met vriendelijke groeten,Scouts Kriko-M
+============================================================
+[2026-05-31 20:25:02] TO: thomas.meyten24@gmail.com | SUBJECT: Bestelbevestiging #ord_6a1c991e86293 - Scouts Kriko-M Webshop
+BODY:
+Beste Thomas Meyten,
+        Bedankt voor uw bestelling bij de Scouts Kriko-M Webshop! We hebben uw bestelling succesvol ontvangen onder bestellingsnummer: ord_6a1c991e86293.
+        
+        Gelieve de betaling van €15,00 handmatig via overschrijving te voldoen met de onderstaande details:
+        
+        
+            💳 Overschrijving details
+            
+                Begunstigde: Scouts Kriko-M
+                IBAN-nummer: BE59 7360 6413 2626
+                Bedrag: €15,00
+                Gestructureerde mededeling: +++536/0254/81387+++
+            
+            ⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch verwerken.
+        
+        
+        Bestelde artikelen
+        
+            
+                
+                    Artikel
+                    Prijs
+                
+            
+            
+                
+                1x Kriko-M T-shirt (Adults) (Maat: S)
+                €15,00
+            
+                
+                    TOTAAL BEDRAG:
+                    €15,00
+                
+            
+        
+        
+        Zodra wij uw betaling goed ontvangen, ligt de bestelling de eerstvolgende zondag na de meeting voor u klaar aan de lokalen (VP-plein)!
+        U kunt de actuele status van uw bestelling ook te allen tijde opvolgen via het Ouderportaal.
+============================================================
+[2026-05-31 20:27:46] TO: thomas.meyten24@gmail.com | SUBJECT: Scouts Kriko-M - Wachtwoord Herstellen
+BODY:
+Beste Thomas Meyten,
+            Er is een verzoek ingediend om het wachtwoord van uw ouderaccount op het Scouts Kriko-M Ouderportaal te herstellen.
+            Klik op de onderstaande knop om uw wachtwoord opnieuw in te stellen. Deze link is 1 uur geldig:
+            
+            
+                Wachtwoord Herstellen
+            
+            
+            Als de knop niet werkt, kunt u ook de volgende link kopiëren en plakken in uw browser:
+            http://localhost:8000//reset-password.php?token=10680330ed4d6986e30b3aa45a6924d7
+            
+            Indien u dit verzoek niet zelf heeft ingediend, kunt u deze e-mail veilig negeren. Er worden geen wijzigingen aan uw account aangebracht.
+            Met vriendelijke groeten,Scouts Kriko-M
+============================================================
+[2026-05-31 20:32:28] TO: groepsleiding@kriko-m.be | SUBJECT: Scouts Kriko-M - Wachtwoord Herstellen
+BODY:
+Beste Groepsleiding,
+            Er is een verzoek ingediend om het wachtwoord van het groepsleiding-account te herstellen.
+            Klik op de onderstaande knop om uw wachtwoord opnieuw in te stellen. Deze link is 1 uur geldig:
+            
+            
+                Wachtwoord Herstellen
+            
+            
+            Als de knop niet werkt, kunt u ook de volgende link kopiëren en plakken in uw browser:
+            http://localhost:8000//reset-password.php?token=a704b5decf4952299ed6689b48ced41e
+            
+            Indien u dit verzoek niet zelf heeft ingediend, kunt u deze e-mail veilig negeren. Er worden geen wijzigingen aan uw account aangebracht.
+            Met vriendelijke groeten,Scouts Kriko-M
+============================================================
+[2026-05-31 20:50:56] TO: thomas.meyten24@gmail.com | SUBJECT: Inschrijving Bevestiging: Giver Zomerkamp - Scouts Kriko-M
+BODY:
+Beste Thomas Meyten,
+                    Gefeliciteerd! Uw inschrijving voor Giver Zomerkamp is succesvol geregistreerd voor uw kind: Papa junior Meyten.
+                    
+                    Gelieve de deelnamebijdrage van €145,00 handmatig via overschrijving te voldoen met de onderstaande details:
+                    
+                    
+                        💳 Overschrijving details
+                        
+                            Begunstigde: Scouts Kriko-M
+                            IBAN-nummer: BE59 7360 6413 2626
+                            Bedrag: €145,00
+                            Gestructureerde mededeling: +++563/6989/17949+++
+                        
+                        ⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch koppelen aan de inschrijving.
+                    
+                    
+                    Inschrijving samenvatting
+                    
+                        
+                            
+                                Deelnemer
+                                Tak
+                                Prijs
+                            
+                        
+                        
+                            
+                                Papa junior Meyten
+                                Givers
+                                €145,00
+                            
+                        
+                    
+                            Opmerkingen / Medische info:
+                            ik kom lah
+                        Zodra we uw overschrijving ontvangen, keurt de takleiding de inschrijving goed. U kunt de status en betalingsbevestiging te allen tijde opvolgen via het Ouderportaal.
+                    We kijken er alvast enorm naar uit om er een geweldig avontuur van te maken!
+============================================================
+[2026-05-31 20:53:33] TO: thomas.meyten24@gmail.com | SUBJECT: Bestelbevestiging #ord_6a1c9fcd1533e - Scouts Kriko-M Webshop
+BODY:
+Beste Thomas Meyten,
+        Bedankt voor uw bestelling bij de Scouts Kriko-M Webshop! We hebben uw bestelling succesvol ontvangen onder bestellingsnummer: ord_6a1c9fcd1533e.
+        
+        Gelieve de betaling van €10,00 handmatig via overschrijving te voldoen met de onderstaande details:
+        
+        
+            💳 Overschrijving details
+            
+                Begunstigde: Scouts Kriko-M
+                IBAN-nummer: BE59 7360 6413 2626
+                Bedrag: €10,00
+                Gestructureerde mededeling: +++525/5620/52587+++
+            
+            ⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch verwerken.
+        
+        
+        Bestelde artikelen
+        
+            
+                
+                    Artikel
+                    Prijs
+                
+            
+            
+                
+                1x Kriko-M Groepsdas (Maat: Eén maat)
+                €10,00
+            
+                
+                    TOTAAL BEDRAG:
+                    €10,00
+                
+            
+        
+        
+        Zodra wij uw betaling goed ontvangen, ligt de bestelling de eerstvolgende zondag na de meeting voor u klaar aan de lokalen (VP-plein)!
+        U kunt de actuele status van uw bestelling ook te allen tijde opvolgen via het Ouderportaal.
+============================================================
+[2026-05-31 21:10:35] TO: liesbeth.decolvenaer@telenet.be | SUBJECT: Inschrijving Bevestiging: Giver Zomerkamp - Scouts Kriko-M
+BODY:
+Beste Liesbeth De Colvenaer,
+                    Gefeliciteerd! Uw inschrijving voor Giver Zomerkamp is succesvol geregistreerd voor uw kind: Sara Junior Meyten.
+                    
+                    Gelieve de deelnamebijdrage van €145,00 handmatig via overschrijving te voldoen met de onderstaande details:
+                    
+                    
+                        💳 Overschrijving details
+                        
+                            Begunstigde: Scouts Kriko-M
+                            IBAN-nummer: BE59 7360 6413 2626
+                            Bedrag: €145,00
+                            Gestructureerde mededeling: +++958/7150/96990+++
+                        
+                        ⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch koppelen aan de inschrijving.
+                    
+                    
+                    Inschrijving samenvatting
+                    
+                        
+                            
+                                Deelnemer
+                                Tak
+                                Prijs
+                            
+                        
+                        
+                            
+                                Sara Junior Meyten
+                                Givers
+                                €145,00
+                            
+                        
+                    Zodra we uw overschrijving ontvangen, keurt de takleiding de inschrijving goed. U kunt de status en betalingsbevestiging te allen tijde opvolgen via het Ouderportaal.
+                    We kijken er alvast enorm naar uit om er een geweldig avontuur van te maken!
+============================================================
+[2026-05-31 21:12:09] TO: liesbeth.decolvenaer@telenet.be | SUBJECT: Bestelbevestiging #ord_6a1ca429f1d79 - Scouts Kriko-M Webshop
+BODY:
+Beste Liesbeth De Colvenaer,
+        Bedankt voor uw bestelling bij de Scouts Kriko-M Webshop! We hebben uw bestelling succesvol ontvangen onder bestellingsnummer: ord_6a1ca429f1d79.
+        
+        Gelieve de betaling van €10,00 handmatig via overschrijving te voldoen met de onderstaande details:
+        
+        
+            💳 Overschrijving details
+            
+                Begunstigde: Scouts Kriko-M
+                IBAN-nummer: BE59 7360 6413 2626
+                Bedrag: €10,00
+                Gestructureerde mededeling: +++388/5299/19787+++
+            
+            ⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch verwerken.
+        
+        
+        Bestelde artikelen
+        
+            
+                
+                    Artikel
+                    Prijs
+                
+            
+            
+                
+                1x Kriko-M Groepsdas (Maat: Eén maat)
+                €10,00
+            
+                
+                    TOTAAL BEDRAG:
+                    €10,00
+                
+            
+        
+        
+        Zodra wij uw betaling goed ontvangen, ligt de bestelling de eerstvolgende zondag na de meeting voor u klaar aan de lokalen (VP-plein)!
+        U kunt de actuele status van uw bestelling ook te allen tijde opvolgen via het Ouderportaal.
+============================================================

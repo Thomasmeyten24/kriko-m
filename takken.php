@@ -139,7 +139,7 @@ if ($selected_tak) {
                 <div class="side-card">
                     <h3>Uniform regels</h3>
                     <p style="font-size: 0.9rem; line-height: 1.5; color: var(--color-text-dark);"><?php echo $tak['uniform']; ?></p>
-                    <a href="shop.php" class="tak-card-link" style="margin-top: 14px; display: inline-flex;">Bestel onze groepsdas &raquo;</a>
+                    <a href="ouderportaal.php?show_webshop=1" class="tak-card-link" style="margin-top: 14px; display: inline-flex;">Bestel onze groepsdas &raquo;</a>
                 </div>
             </div>
         </div>

@@ -47,14 +47,14 @@ $calendar_events = read_db('calendar');
         <div>
             <h3 style="font-size: 2rem; margin-bottom: 16px; color: var(--color-primary-dark);">Al meer dan 80 jaar scouting in Sint-Niklaas</h3>
             <p style="margin-bottom: 16px; font-size: 1.05rem; color: var(--color-text-dark);">
-                Scouts Kriko-M staat voor actie, vriendschap en zelfstandigheid. Elke zondagochtend van <strong>9:45 tot 12:30</strong> openen wij onze lokalen op het VP-plein voor een namiddag vol bosspelen, sjorringen, sportieve uitdagingen en gezelligheid.
+                Scouts Kriko-M staat voor actie, vriendschap en zelfstandigheid. Elke zondagochtend van <strong>9:45 tot 12:30</strong> openen wij ons lokaal op het VP-plein voor een namiddag vol bosspelen, sjorringen, sportieve uitdagingen en gezelligheid.
             </p>
             <p style="color: var(--color-text-muted);">
                 Onze leiding is een enthousiaste en ervaren groep vrijwilligers die elke week de leukste en veiligste activiteiten bedenken voor onze leden. Ontdek snel in welke tak jouw kind past en kom gerust eens gratis proberen!
             </p>
             <div style="margin-top: 24px; display: flex; gap: 16px;">
                 <a href="inschrijven.php" class="btn btn-secondary">Hoe werkt het?</a>
-                <a href="contact.php" class="btn btn-outline">Vind onze lokalen</a>
+                <a href="contact.php" class="btn btn-outline">Vind ons lokaal</a>
             </div>
         </div>
         <div style="position: relative;">

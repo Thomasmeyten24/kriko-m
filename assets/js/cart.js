@@ -9,17 +9,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initCart() {
     // Select cart elements
-    const cartTrigger = document.querySelector('.cart-trigger-btn');
+    const cartTriggers = document.querySelectorAll('.cart-trigger-btn');
     const cartDrawer = document.querySelector('.cart-drawer');
     const cartClose = document.querySelector('.cart-drawer-close');
     const cartBackdrop = document.querySelector('.cart-backdrop');
     
     // Toggle Cart Drawer
-    if (cartTrigger && cartDrawer && cartBackdrop) {
-        cartTrigger.addEventListener('click', () => {
-            cartDrawer.classList.add('open');
-            cartBackdrop.classList.add('open');
-            updateCartUI();
+    if (cartTriggers.length > 0 && cartDrawer && cartBackdrop) {
+        cartTriggers.forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                cartDrawer.classList.add('open');
+                cartBackdrop.classList.add('open');
+                updateCartUI();
+            });
         });
     }
     
@@ -31,10 +33,10 @@ function initCart() {
         cartBackdrop.addEventListener('click', closeCart);
     }
     
-    // Bind Add to Cart buttons
-    const addToCartBtns = document.querySelectorAll('.btn-add-to-cart');
-    addToCartBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    // Bind Add to Cart buttons using document delegation (robust against dynamic SPA DOM swaps!)
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-add-to-cart');
+        if (btn) {
             const itemId = btn.getAttribute('data-id');
             const itemName = btn.getAttribute('data-name');
             const itemPrice = parseFloat(btn.getAttribute('data-price'));
@@ -42,11 +44,11 @@ function initCart() {
             
             // Get selected size from parent container
             const card = btn.closest('.shop-card');
-            const sizeSelect = card.querySelector('.shop-size-select');
+            const sizeSelect = card ? card.querySelector('.shop-size-select') : null;
             const selectedSize = sizeSelect ? sizeSelect.value : 'Standaard';
             
             addToCart(itemId, itemName, itemPrice, selectedSize, itemImage);
-        });
+        }
     });
     
     // Initial UI render
@@ -153,18 +155,23 @@ function updateCartUI() {
     const cart = getCart();
     
     // 1. Update Navigation Badge Counts & Trigger Button Visibility
-    const badge = document.querySelector('.cart-count');
-    const cartTrigger = document.querySelector('.cart-trigger-btn');
+    const badges = document.querySelectorAll('.cart-count');
+    const cartTriggers = document.querySelectorAll('.cart-trigger-btn');
     const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
     
-    if (cartTrigger) {
-        cartTrigger.style.display = totalQty > 0 ? 'inline-flex' : 'none';
-    }
+    cartTriggers.forEach(trigger => {
+        // Floating FAB on portal should use flex, standard headers should use inline-flex
+        if (trigger.style.position === 'fixed') {
+            trigger.style.display = totalQty > 0 ? 'flex' : 'none';
+        } else {
+            trigger.style.display = totalQty > 0 ? 'inline-flex' : 'none';
+        }
+    });
     
-    if (badge) {
+    badges.forEach(badge => {
         badge.textContent = totalQty;
         badge.style.display = totalQty > 0 ? 'flex' : 'none';
-    }
+    });
     
     // 2. Render Drawer List
     const drawerBody = document.querySelector('.cart-drawer-body');

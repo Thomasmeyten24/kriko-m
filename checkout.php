@@ -7,8 +7,18 @@
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/parent_auth.php';
+require_once __DIR__ . '/includes/mail.php';
 
-$current_parent = is_parent_logged_in() ? get_logged_in_parent() : null;
+if (!is_parent_logged_in()) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $_SESSION['parent_error'] = 'U moet ingelogd zijn in het ouderportaal om een bestelling te plaatsen.';
+    session_write_close();
+    header('Location: ouderportaal.php');
+    exit;
+}
+$current_parent = get_logged_in_parent();
 
 
 // Helper function to generate a valid Belgian structured communication reference (Modulo 97)
@@ -79,6 +89,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $orders = read_db('orders');
         $orders[] = $order;
         write_db('orders', $orders);
+        
+        // Prepare HTML receipt email body
+        $settings = read_db('settings');
+        $bank_iban = isset($settings['bank_iban']) ? $settings['bank_iban'] : 'BE76 1234 5678 9012';
+        $bank_holder = isset($settings['bank_holder']) ? $settings['bank_holder'] : 'Scouts Kriko-M vzw';
+        
+        $items_html = '';
+        foreach ($cart as $item) {
+            $items_html .= "<tr>
+                <td style='padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left;'>{$item['quantity']}x " . htmlspecialchars($item['name']) . " (Maat: " . htmlspecialchars($item['size']) . ")</td>
+                <td style='padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right;'>€" . number_format($item['price'] * $item['quantity'], 2, ',', '.') . "</td>
+            </tr>";
+        }
+        
+        $email_body = "<h2>Beste " . htmlspecialchars($customer_name) . ",</h2>
+        <p>Bedankt voor uw bestelling bij de Scouts Kriko-M Webshop! We hebben uw bestelling succesvol ontvangen onder bestellingsnummer: <strong>{$order_id}</strong>.</p>
+        
+        <p>Gelieve de betaling van <strong>€" . number_format($total, 2, ',', '.') . "</strong> handmatig via overschrijving te voldoen met de onderstaande details:</p>
+        
+        <div class='payment-box'>
+            <h4>💳 Overschrijving details</h4>
+            <div class='payment-details'>
+                <strong>Begunstigde:</strong> <span>" . htmlspecialchars($bank_holder) . "</span>
+                <strong>IBAN-nummer:</strong> <code>" . htmlspecialchars($bank_iban) . "</code>
+                <strong>Bedrag:</strong> <span style='font-size: 1.1rem; color: #d97706; font-weight: 700;'>€" . number_format($total, 2, ',', '.') . "</span>
+                <strong>Gestructureerde mededeling:</strong> <code style='font-weight: bold; color: #7a1b2e;'>{$comm}</code>
+            </div>
+            <p class='warning-text'>⚠ Let op: Vermeld de gestructureerde mededeling exact zoals hierboven getoond, anders kan de leiding uw betaling niet automatisch verwerken.</p>
+        </div>
+        
+        <h3 style='color: #7a1b2e; font-size: 1.15rem; margin-top: 25px; margin-bottom: 10px; font-weight: bold;'>Bestelde artikelen</h3>
+        <table style='width: 100%; border-collapse: collapse; margin-bottom: 25px;'>
+            <thead>
+                <tr style='background-color: #7a1b2e; color: white;'>
+                    <th style='padding: 10px; text-align: left;'>Artikel</th>
+                    <th style='padding: 10px; text-align: right;'>Prijs</th>
+                </tr>
+            </thead>
+            <tbody>
+                {$items_html}
+                <tr style='font-weight: bold; background-color: #faf9f6;'>
+                    <td style='padding: 10px; text-align: left;'>TOTAAL BEDRAG:</td>
+                    <td style='padding: 10px; text-align: right; color: #d97706; font-size: 1.1rem;'>€" . number_format($total, 2, ',', '.') . "</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p>Zodra wij uw betaling goed ontvangen, ligt de bestelling de <strong>eerstvolgende zondag</strong> na de meeting voor u klaar aan de lokalen (VP-plein)!</p>
+        <p>U kunt de actuele status van uw bestelling ook te allen tijde opvolgen via het <a href='" . (isset($_SERVER['HTTPS']) ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . dirname($_SERVER['PHP_SELF']) . "/ouderportaal.php'>Ouderportaal</a>.</p>";
+        
+        // Trigger email sending
+        scouts_send_mail($email, "Bestelbevestiging #{$order_id} - Scouts Kriko-M Webshop", $email_body);
         
         // Save to session to display on success page
         if (session_status() === PHP_SESSION_NONE) {
@@ -190,7 +252,7 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
             
-            <a href="shop.php" class="btn btn-outline" style="width: 100%;">
+            <a href="ouderportaal.php?show_webshop=1" class="btn btn-outline" style="width: 100%;">
                 &larr; Verder winkelen
             </a>
         </div>

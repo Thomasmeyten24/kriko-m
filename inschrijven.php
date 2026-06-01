@@ -39,7 +39,7 @@ $contact_email = isset($settings['contact_email']) ? $settings['contact_email'] 
                 <div class="step-body">
                     <h4>Kom gratis proberen!</h4>
                     <p style="color: var(--color-text-dark); font-size: 0.95rem;">
-                        Nieuwe leden hoeven zich niet meteen in te schrijven. Ieder kind mag eerst **3 keer gratis proberen**! Kom gewoon op zondagochtend om <strong>9:45 stipt</strong> langs bij onze lokalen op het VP-plein (Industriepark-Noord 33). Onze leiding heet je kind van harte welkom en hij of zij kan direct meespelen en ontdekken!
+                        Nieuwe leden hoeven zich niet meteen in te schrijven. Ieder kind mag eerst <strong>3 keer gratis proberen</strong>! Kom gewoon op zondagochtend om <strong>9:45 stipt</strong> langs bij ons lokaal op het VP-plein (Industriepark-Noord 33). Onze leiding heet je kind van harte welkom en hij of zij kan direct meespelen en ontdekken!
                     </p>
                 </div>
             </div>
@@ -50,7 +50,7 @@ $contact_email = isset($settings['contact_email']) ? $settings['contact_email'] 
                 <div class="step-body">
                     <h4>Inschrijven via ons Ouderportaal</h4>
                     <p style="color: var(--color-text-dark); font-size: 0.95rem; margin-bottom: 12px;">
-                        Als je kind na drie proefzondagen overtuigd is, kun je hem of haar officieel inschrijven via ons **Ouderportaal** op deze website. Hier beheer je de gegevens van je kinderen, schrijf je ze in voor weekenden/kampen en volg je bestellingen.
+                        Als je kind na drie proefzondagen overtuigd is, kun je hem of haar officieel inschrijven via ons <strong>Ouderportaal</strong> op deze website. Hier beheer je de gegevens van je kinderen, schrijf je ze in voor weekenden/kampen en volg je bestellingen.
                     </p>
                     <a href="ouderportaal.php" class="btn btn-secondary" style="font-size: 0.9rem; padding: 8px 18px;">
                         Naar het Ouderportaal &raquo;
@@ -111,11 +111,11 @@ $contact_email = isset($settings['contact_email']) ? $settings['contact_email'] 
                 <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
                     <li>
                         <strong>Verminderd Lidgeld:</strong>
-                        <span style="color: var(--color-text-muted); display: block; margin-top: 2px;">Dankzij *Scouting op Maat* betalen gezinnen met financiële moeilijkheden slechts **€10** (of **€5** na 1 maart). Neem discreet contact op met de groepsleiding via <a href="mailto:<?php echo htmlspecialchars($contact_email); ?>" style="color: var(--color-primary); font-weight: 700; text-decoration: underline;"><?php echo htmlspecialchars($contact_email); ?></a>.</span>
+                        <span style="color: var(--color-text-muted); display: block; margin-top: 2px;">Dankzij *Scouting op Maat* betalen gezinnen met financiële moeilijkheden slechts <strong>€10</strong> (of <strong>€5</strong> na 1 maart). Neem discreet contact op met de groepsleiding via <a href="mailto:<?php echo htmlspecialchars($contact_email); ?>" style="color: var(--color-primary); font-weight: 700; text-decoration: underline;"><?php echo htmlspecialchars($contact_email); ?></a>.</span>
                     </li>
                     <li>
                         <strong>Mutualiteit terugbetaling:</strong>
-                        <span style="color: var(--color-text-muted); display: block; margin-top: 2px;">Vlaamse mutualiteiten (CM, Helan, Solidaris, LM) betalen jaarlijks **€15 tot €25** van het lidgeld of kampen terug! Download het formulier en bezorg het aan de leiding.</span>
+                        <span style="color: var(--color-text-muted); display: block; margin-top: 2px;">Vlaamse mutualiteiten (CM, Helan, Solidaris, LM) betalen jaarlijks <strong>€15 tot €25</strong> van het lidgeld of kampen terug! Download het formulier en bezorg het aan de leiding.</span>
                     </li>
                     <li>
                         <strong>Fiscaal Attest:</strong>

@@ -41,7 +41,7 @@ $scouts_year = isset($settings['scouts_year']) ? $settings['scouts_year'] : '202
                         <li><a href="index.php" class="footer-link">&raquo; Home</a></li>
                         <li><a href="takken.php" class="footer-link">&raquo; Onze Takken</a></li>
                         <li><a href="echos.php" class="footer-link">&raquo; Kriko Echo's</a></li>
-                        <li><a href="shop.php" class="footer-link">&raquo; Kledij Webshop</a></li>
+                        <li><a href="ouderportaal.php?show_webshop=1" class="footer-link">&raquo; Kledij Webshop</a></li>
                         <li><a href="inschrijven.php" class="footer-link">&raquo; Lid Worden</a></li>
                         <li><a href="contact.php" class="footer-link">&raquo; Contacteer Ons</a></li>
                     </ul>

@@ -67,16 +67,15 @@ function active_class($page, $current) {
                 <!-- Brand Logo -->
                 <a href="index.php" class="logo-link">
                     <?php if (file_exists(dirname(__DIR__) . '/assets/images/logo.png')): ?>
-                        <img src="assets/images/logo.png" alt="Logo Kriko-M" style="height: 50px; width: auto; border-radius: 50%; border: 2px solid var(--color-accent);">
+                        <img src="assets/images/logo.png" alt="Logo Kriko-M" class="logo-img">
                     <?php else: ?>
                         <!-- Fallback SVG scouts emblem for logo -->
-                        <svg style="width: 45px; height: 45px; fill: var(--color-accent);" viewBox="0 0 24 24">
+                        <svg class="logo-img logo-svg" style="fill: var(--color-accent); padding: 6px;" viewBox="0 0 24 24">
                             <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm0 2.18l6 2.25v4.66c0 4.14-2.56 8-6 9.07-3.44-1.07-6-4.93-6-9.07V6.43l6-2.25zM12 7c-1.66 0-3 1.34-3 3 0 2.25 3 5 3 5s3-2.75 3-5c0-1.66-1.34-3-3-3zm0 4.5c-.83 0-1.5-.67-1.5-1.5S11.17 8.5 12 8.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
                         </svg>
                     <?php endif; ?>
                     <div class="logo-text">
                         <h1>Kriko-M</h1>
-                        <span>Sint-Niklaas</span>
                     </div>
                 </a>
 
@@ -92,15 +91,13 @@ function active_class($page, $current) {
                                 Takken <span style="font-size: 0.75rem; margin-left: 2px; vertical-align: middle;">▼</span>
                             </a>
                             <div class="nav-dropdown-content">
-                                <a href="takken.php">Alle Takken</a>
                                 <a href="takken.php?tak=kapoenen">Kapoenen (6-8j)</a>
                                 <a href="takken.php?tak=welpen">Welpen (8-11j)</a>
                                 <a href="takken.php?tak=jonggivers">Jonggivers (11-14j)</a>
                                 <a href="takken.php?tak=givers">Givers (14-17j)</a>
                             </div>
                         </li>
-                        <li><a href="echos.php" class="nav-link <?php echo active_class('echos.php', $current_page); ?>">Kriko Echo's</a></li>
-                        <li><a href="shop.php" class="nav-link <?php echo active_class('shop.php', $current_page); ?>">Webshop</a></li>
+                        <li><a href="echos.php" class="nav-link <?php echo active_class('echos.php', $current_page); ?>">Kriko Echo</a></li>
                         <li><a href="contact.php" class="nav-link <?php echo active_class('contact.php', $current_page); ?>">Contact</a></li>
                     </ul>
 
@@ -119,7 +116,7 @@ function active_class($page, $current) {
                             <a href="login.php?logout=1" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.9rem; color: var(--color-bg-white); border-color: var(--color-bg-white);">Log uit</a>
                         <?php else: ?>
                             <a href="inschrijven.php" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem; white-space: nowrap;">Inschrijven</a>
-                            <a href="ouderportaal.php" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9rem; white-space: nowrap;">Ouderportaal</a>
+                            <a href="ouderportaal.php" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9rem; white-space: nowrap; color: #ffffff !important;">Ouderportaal</a>
                         <?php endif; ?>
                     </div>
                 </nav>

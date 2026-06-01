@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/mail.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -36,27 +37,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $recipient_role = '';
         $parent_record = null;
         
-        // 1. Check if groepsleiding contact email
-        if ($email === 'thomas.meyten24@gmail.com' || $email === $contact_email) {
+        // 1. Check if a registered parent email (primary or secondary)
+        $parents = read_db('parents');
+        foreach ($parents as $parent) {
+            if (strtolower($parent['email']) === $email) {
+                $is_parent = true;
+                $recipient_role = 'parent_primary';
+                $parent_record = $parent;
+                break;
+            }
+            if (isset($parent['secondary_email']) && strtolower($parent['secondary_email']) === $email) {
+                $is_parent = true;
+                $recipient_role = 'parent_secondary';
+                $parent_record = $parent;
+                break;
+            }
+        }
+        
+        // 2. Check if groepsleiding contact email (only if not a registered parent)
+        if (!$is_parent && $email === $contact_email) {
             $is_admin = true;
             $recipient_role = 'groepsleiding';
-        } else {
-            // 2. Check if a registered parent email (primary or secondary)
-            $parents = read_db('parents');
-            foreach ($parents as $parent) {
-                if (strtolower($parent['email']) === $email) {
-                    $is_parent = true;
-                    $recipient_role = 'parent_primary';
-                    $parent_record = $parent;
-                    break;
-                }
-                if (isset($parent['secondary_email']) && strtolower($parent['secondary_email']) === $email) {
-                    $is_parent = true;
-                    $recipient_role = 'parent_secondary';
-                    $parent_record = $parent;
-                    break;
-                }
-            }
         }
         
         if ($is_admin || $is_parent) {
@@ -89,34 +90,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $subject = 'Scouts Kriko-M - Wachtwoord Herstellen';
             
             if ($is_admin) {
-                $message = "Beste Groepsleiding,\n\n";
-                $message .= "Er is een verzoek ingediend om het wachtwoord van het groepsleiding-account te herstellen.\n";
+                $salutation = "Beste Groepsleiding,";
+                $intro = "Er is een verzoek ingediend om het wachtwoord van het groepsleiding-account te herstellen.";
             } else {
                 $name = $recipient_role === 'parent_primary' 
                     ? $parent_record['first_name'] . ' ' . $parent_record['last_name']
                     : $parent_record['secondary_first_name'] . ' ' . $parent_record['secondary_last_name'];
-                $message = "Beste " . $name . ",\n\n";
-                $message .= "Er is een verzoek ingediend om het wachtwoord van uw ouderaccount op het Scouts Kriko-M Ouderportaal te herstellen.\n";
+                $salutation = "Beste " . htmlspecialchars($name) . ",";
+                $intro = "Er is een verzoek ingediend om het wachtwoord van uw ouderaccount op het Scouts Kriko-M Ouderportaal te herstellen.";
             }
             
-            $message .= "Gebruik de onderstaande link om een nieuw wachtwoord in te stellen. Deze link is 1 uur geldig:\n\n";
-            $message .= $reset_url . "\n\n";
-            $message .= "Indien u dit verzoek niet zelf heeft ingediend, kunt u deze mail veilig negeren.\n\n";
-            $message .= "Met vriendelijke groeten,\n";
-            $message .= "Scouts Kriko-M";
+            $email_body = "<h2>{$salutation}</h2>
+            <p>{$intro}</p>
+            <p>Klik op de onderstaande knop om uw wachtwoord opnieuw in te stellen. Deze link is <strong>1 uur geldig</strong>:</p>
             
-            $headers = "From: no-reply@kriko-m.be\r\n";
-            $headers .= "Reply-To: no-reply@kriko-m.be\r\n";
-            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+            <div class='button-container'>
+                <a href='" . htmlspecialchars($reset_url) . "' class='button' style='color: #ffffff !important;'>Wachtwoord Herstellen</a>
+            </div>
             
-            // Attempt standard PHP mail delivery
-            @mail($to, $subject, $message, $headers);
+            <p style='font-size: 0.85rem; color: #64748b;'>Als de knop niet werkt, kunt u ook de volgende link kopiëren en plakken in uw browser:<br>
+            <a href='" . htmlspecialchars($reset_url) . "' style='color: #7a1b2e;'>{$reset_url}</a></p>
             
-            // Log details locally inside data/email_log.txt for local verification
-            $log_entry = "[" . date('Y-m-d H:i:s') . "] To: {$to} | Link: {$reset_url}\n";
-            file_put_contents(DATA_DIR . 'email_log.txt', $log_entry, FILE_APPEND);
+            <p>Indien u dit verzoek niet zelf heeft ingediend, kunt u deze e-mail veilig negeren. Er worden geen wijzigingen aan uw account aangebracht.</p>
+            <p>Met vriendelijke groeten,<br><strong>Scouts Kriko-M</strong></p>";
             
-            $success = "Er is succesvol een herstelmail verzonden naar **" . htmlspecialchars($email) . "**! Controleer uw inbox (en spamfolder).<br><br><span style='font-size: 0.85rem; opacity: 0.9;'>* Voor lokaal testen zonder mailserver is de link ook weggeschreven naar `data/email_log.txt`!</span>";
+            // Send HTML email via our socket/Mailpit engine!
+            scouts_send_mail($to, $subject, $email_body);
+            
+            $success = "Er is succesvol een herstelmail verzonden naar <strong>" . htmlspecialchars($email) . "</strong>! Controleer uw inbox (en spamfolder).<br><br><span style='font-size: 0.85rem; opacity: 0.9;'>* Voor lokaal testen zonder mailserver is de link ook weggeschreven naar `data/email_log.txt`!</span>";
         } else {
             $error = 'Dit e-mailadres is niet bekend in ons systeem als groepsleiding of als geregistreerde ouder.';
         }
